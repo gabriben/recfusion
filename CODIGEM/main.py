@@ -268,11 +268,11 @@ if __name__ == '__main__':
     for e in range(num_epochs):
 
         # Training and Validation procedure
-        # nll_val = dg.training(
-        #     model=model, optimizer=optimizer, training_loader=train_data)
+        nll_val = dg.training(
+            model=model, optimizer=optimizer, training_loader=train_data)
 
-        # nll_val_list.append(nll_val)  # save for plotting
-        # print("Loss at the training epoch {} is {}".format(e+1, nll_val))
+        nll_val_list.append(nll_val)  # save for plotting
+        print("Loss at the training epoch {} is {}".format(e+1, nll_val))
 
         # Validation Procedure
 
