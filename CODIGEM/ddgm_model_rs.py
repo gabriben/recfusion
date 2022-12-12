@@ -221,8 +221,8 @@ def training(model, optimizer, training_loader):
 
         data = naive_sparse2tensor(data)
 
-        print(data)
-        print(data.shape)
+        # print(data)
+        # print(data.shape)
         
         data = data.to(device)
 
