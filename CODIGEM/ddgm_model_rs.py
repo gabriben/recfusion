@@ -220,6 +220,10 @@ def training(model, optimizer, training_loader):
         data = training_loader[idxlist[start_idx:end_idx]]
 
         data = naive_sparse2tensor(data)
+
+        print(data)
+        print(data.shape)
+        
         data = data.to(device)
 
         if total_anneal_steps > 0:
@@ -266,7 +270,11 @@ def evaluate(data_tr, data_te, model, N):
             data = data_tr[e_idxlist[start_idx:end_idx]]
             heldout_data = data_te[e_idxlist[start_idx:end_idx]]
 
+            # pdb.set_trace()
             data_tensor = naive_sparse2tensor(data).to(device)
+
+            # print(data_tensor)
+            # print(data_tensor.shape)            
 
             if total_anneal_steps > 0:
                 anneal = min(anneal_cap,
@@ -275,6 +283,10 @@ def evaluate(data_tr, data_te, model, N):
                 anneal = anneal_cap
 
             loss, recon_batch = model.forward(data_tensor, anneal)
+
+            # print(recon_batch)
+
+            # pdb.set_trace()
 
             total_loss += loss.item()
 
@@ -307,4 +319,6 @@ def evaluate(data_tr, data_te, model, N):
     r50_list = np.concatenate(r50_list)
     r100_list = np.concatenate(r100_list)
 
-    return total_loss, np.mean(n20_list), np.mean(n50_list), np.mean(n100_list), np.mean(r20_list), np.mean(r50_list), np.mean(r100_list)
+    # return total_loss, np.mean(n20_list), np.mean(n50_list), np.mean(n100_list), np.mean(r20_list), np.mean(r50_list), np.mean(r100_list)
+
+    return total_loss, np.nanmean(n20_list), np.nanmean(n50_list), np.nanmean(n100_list), np.nanmean(r20_list), np.nanmean(r50_list), np.nanmean(r100_list)
