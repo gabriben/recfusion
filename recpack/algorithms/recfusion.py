@@ -43,7 +43,7 @@ class RecFusion(TorchMLAlgorithm):
     :param learning_rate: Learning rate, defaults to 1e-4
     :type learning_rate: [type], optional
     :param seed: Random seed for Torch, provided for reproducibility,
-                    defaults to None.
+            defaults to None.
     :type seed: int, optional
     :param dim_bottleneck_layer: Size of the latent representation,
                                     defaults to 200
@@ -225,6 +225,7 @@ class RecFusion(TorchMLAlgorithm):
                 # t = torch.FloatTensor([t]).to(self.device)
                 # pdb.set_trace()
                 t = torch.tensor([t], dtype=torch.int32).to(self.device)
+                pdb.set_trace()
                 mu_t = self.model_.forward(Z[t+1][None, None, :, :], t+1)
                 Z_hat.append(mu_t)
                 
