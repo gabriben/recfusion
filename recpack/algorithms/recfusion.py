@@ -198,8 +198,8 @@ class RecFusion(TorchMLAlgorithm):
 
         users = list(set(train_data.nonzero()[0]))
 
-        if users[1] % 2 != 0:
-            users = users[:, :-1]
+        if train_data.shape[1] % 2 != 0:
+            train_data = train_data[:, :-1]
         # if len(user) < 200:       
         #     user = torch.cat((user, self.prev_users), 0)[:200]
 
