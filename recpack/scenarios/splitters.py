@@ -379,7 +379,7 @@ def yield_batches_same_size(iterable, n=1):
         if ndx + n <= l:
             yield iterable[ndx : ndx + n]
         else:
-            yield iterable[ndx : l] + iterable[0 : l - (ndx + n)]
+            yield iterable[ndx : l] + iterable[0 : (ndx + n) - l]
         
 def csr_row_set_nz_to_val(csr: csr_matrix, row, value=0):
     """Set all nonzero elements to the given value. Useful to set to 0 mostly."""
