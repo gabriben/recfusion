@@ -118,11 +118,11 @@ class RecFusion(TorchMLAlgorithm):
         schedule_type: str = "quadratic",
         reduction: str = "avg",
 
-        xavier_initialization: bool = False,
+        # xavier_initialization: bool = False,
         x_to_negpos: bool = False,
-        decode_from_noisiest: bool = False,
-        p_dnns_depth: int = 4,
-        decoder_net_depth: int = 4
+        # decode_from_noisiest: bool = False,
+        # p_dnns_depth: int = 4,
+        # decoder_net_depth: int = 4
     ):
 
         super().__init__(
@@ -141,7 +141,8 @@ class RecFusion(TorchMLAlgorithm):
         )
 
         self.b_start = b_start
-        self.b_end = b_end       
+        self.b_end = b_end
+        self.schedule_type = schedule_type
         betas = self.get_beta_schedule(b_start, b_end, T, schedule_type)
         self.betas = torch.FloatTensor(betas).to(self.device)
 
