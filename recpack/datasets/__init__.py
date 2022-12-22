@@ -69,6 +69,7 @@ from recpack.datasets.cosmetics_shop import CosmeticsShop
 from recpack.datasets.dummy_dataset import DummyDataset
 from recpack.datasets.movielens import MovieLens25M
 from recpack.datasets.movieLens100k import MovieLens100K
+from recpack.datasets.movielens1m import MovieLens1M
 from recpack.datasets.netflix import Netflix
 from recpack.datasets.recsys_challenge import RecsysChallenge2015
 from recpack.datasets.retail_rocket import RetailRocket
