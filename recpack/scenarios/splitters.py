@@ -364,7 +364,23 @@ def yield_batches(iterable, n=1):
     for ndx in range(0, l, n):
         yield iterable[ndx : min(ndx + n, l)]
 
+def yield_batches_same_size(iterable, n=1):
+    """Helper to generate batches from an iterable.
 
+    :param iterable: Iterable to chunk ito batches.
+    :type iterable: Iterable
+    :param n: Size of batch, defaults to 1
+    :type n: int, optional
+    :yield: Batch of length n of the iterable values
+    :rtype: Iterator[Any]
+    """
+    l = len(iterable)
+    for ndx in range(0, l, n):
+        if ndx + n <= l:
+            yield iterable[ndx : ndx + n]
+        else:
+            yield iterable[ndx : l] + iterable[0 : l - (ndx + n)]
+        
 def csr_row_set_nz_to_val(csr: csr_matrix, row, value=0):
     """Set all nonzero elements to the given value. Useful to set to 0 mostly."""
     if not isinstance(csr, csr_matrix):
