@@ -15,6 +15,8 @@ from recpack.algorithms.util import naive_sparse2tensor
 from recpack.scenarios.splitters import yield_batches, yield_batches_same_size
 
 from recpack.algorithms import ddpm
+from recpack.algorithms.util import get_batches, get_users, sample_rows
+from recpack.matrix import InteractionMatrix, to_csr_matrix, Matrix
 
 
 logger = logging.getLogger("recpack")
@@ -331,6 +333,39 @@ class RecFusion(TorchMLAlgorithm):
         result[users] = out_tensor.detach().cpu().numpy()
 
         return result.tocsr()
+
+
+    def _predict(self, X: Matrix) -> csr_matrix:
+        """Compute predictions per batch of users,
+        to avoid going out of RAM on the GPU
+
+        Will batch the nonzero users into batches of self.batch_size.
+
+        :param X: The input user interaction matrix
+        :type X: csr_matrix
+        :return: The predicted affinity of users for items.
+        :rtype: csr_matrix
+        """
+
+        if X.shape[1] % 2 != 0:
+            X = X[:, : -1]
+            
+        results = lil_matrix(X.shape)
+        self.model_.eval()
+        with torch.no_grad():
+            for users in get_batches(get_users(X), batch_size=self.batch_size):
+                if isinstance(X, InteractionMatrix):
+                    batch = X.users_in(users)
+                else:
+                    batch = lil_matrix(X.shape)
+                    batch[users] = X[users]
+                    batch = batch.tocsr()
+
+                results[users] = self._get_top_k_recommendations(self._batch_predict(batch, users=users)[users])
+
+        logger.debug(f"shape of response ({results.shape})")
+
+        return results.tocsr()    
 
 #### CODIGEM
     
