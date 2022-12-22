@@ -316,11 +316,11 @@ class RecFusion(TorchMLAlgorithm):
         :return: Sparse matrix of scores per user item pair.
         :rtype: csr_matrix
         """
-        if X.shape[1] % 2 == 0:
-            active_users = X[users]
-        else :
-            active_users = X[users, : -1]
+        if X.shape[1] % 2 != 0:
+            X = X[:, : -1]
 
+        active_users = X[users]
+            
         in_tensor = naive_sparse2tensor(active_users).to(self.device)
 
         t = torch.tensor([1], dtype=torch.int32).to(self.device)

@@ -9,6 +9,7 @@ from tqdm.auto import tqdm
 
 from recpack.matrix import InteractionMatrix
 
+import pdb
 
 logger = logging.getLogger("recpack")
 
