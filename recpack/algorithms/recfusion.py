@@ -198,6 +198,8 @@ class RecFusion(TorchMLAlgorithm):
 
         users = list(set(train_data.nonzero()[0]))
 
+        if users[1] % 2 != 0:
+            users = users[:, :-1]
         # if len(user) < 200:       
         #     user = torch.cat((user, self.prev_users), 0)[:200]
 
@@ -313,7 +315,10 @@ class RecFusion(TorchMLAlgorithm):
         :return: Sparse matrix of scores per user item pair.
         :rtype: csr_matrix
         """
-        active_users = X[users]
+        if X.shape[1] % 2 == 0:
+            active_users = X[users]
+        else :
+            active_users = X[users, : -1]
 
         in_tensor = naive_sparse2tensor(active_users).to(self.device)
 
