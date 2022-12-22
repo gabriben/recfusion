@@ -179,7 +179,7 @@ class RecFusion(TorchMLAlgorithm):
 
         # I = X.shape[1] # number of items
 
-        self.model_ = OriginalUnet(dim = 1, channels = 1, resnet_block_groups=1, dim_mults=(1, 2))
+        self.model_ = OriginalUnet(dim = 1, channels = 1, resnet_block_groups=1, dim_mults=(1, 2)).to(self.device)
 
         self.optimizer = optim.Adam(self.model_.parameters(), lr=self.learning_rate)
 
@@ -225,7 +225,6 @@ class RecFusion(TorchMLAlgorithm):
                 # t = torch.FloatTensor([t]).to(self.device)
                 # pdb.set_trace()
                 t = torch.tensor([t], dtype=torch.int32).to(self.device)
-                pdb.set_trace()
                 mu_t = self.model_.forward(Z[t+1][None, None, :, :], t+1)
                 Z_hat.append(mu_t)
                 
