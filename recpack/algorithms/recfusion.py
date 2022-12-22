@@ -140,6 +140,8 @@ class RecFusion(TorchMLAlgorithm):
             validation_sample_size=validation_sample_size,
         )
 
+        self.b_start = b_start
+        self.b_end = b_end       
         betas = self.get_beta_schedule(b_start, b_end, T, schedule_type)
         self.betas = torch.FloatTensor(betas).to(self.device)
 
