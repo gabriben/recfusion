@@ -2,8 +2,6 @@ from recpack.matrix import InteractionMatrix
 from recpack.scenarios import Scenario
 from recpack.scenarios.splitters import FractionInteractionSplitter
 
-import pdb
-
 class WeakGeneralizationEvenItems(Scenario):
     """Predict (randomly) held-out interactions for all users, with remaining data used for training.
 
@@ -102,11 +100,7 @@ class WeakGeneralizationEvenItems(Scenario):
 
         :param data: Interaction matrix to be split.
         :type data: InteractionMatrix
-        """
-        pdb.set_trace()
-        if data.shape[1] % 2 != 0:
-            data = data[:, : -1]
-        
+        """        
         self._full_train_X, self._test_data_out = self.interaction_split.split(data)
 
         if self.validation:
