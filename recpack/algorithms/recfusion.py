@@ -318,8 +318,6 @@ class RecFusion(TorchMLAlgorithm):
         :return: Sparse matrix of scores per user item pair.
         :rtype: csr_matrix
         """
-        if X.shape[1] % 2 != 0:
-            X = X[:, : -1]
 
         active_users = X[users]
             
@@ -346,10 +344,7 @@ class RecFusion(TorchMLAlgorithm):
         :return: The predicted affinity of users for items.
         :rtype: csr_matrix
         """
-
-        if X.shape[1] % 2 != 0:
-            X = X[:, : -1]
-            
+        
         results = lil_matrix(X.shape)
         self.model_.eval()
         with torch.no_grad():

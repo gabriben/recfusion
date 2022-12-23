@@ -118,5 +118,5 @@ class MovieLens1M(Dataset):
             sep="\:\:",
             names=[self.USER_IX, self.ITEM_IX, self.RATING_IX, self.TIMESTAMP_IX]
         )
-
+        
         return df

@@ -68,3 +68,4 @@ from recpack.scenarios.strong_generalization import StrongGeneralization
 from recpack.scenarios.timed import Timed
 from recpack.scenarios.timed_last_item_prediction import TimedLastItemPrediction
 from recpack.scenarios.weak_generalization import WeakGeneralization
+from recpack.scenarios.weak_generalization_even_items import WeakGeneralizationEvenItems
