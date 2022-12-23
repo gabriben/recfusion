@@ -197,9 +197,6 @@ class RecFusion(TorchMLAlgorithm):
         :type train_data: [type]
         """
         losses = []
-
-        if train_data.shape[1] % 2 != 0:
-            train_data = train_data[:, :-1]
         
         users = list(set(train_data.nonzero()[0]))
 
@@ -212,6 +209,9 @@ class RecFusion(TorchMLAlgorithm):
 
         for batch_idx, user_batch in enumerate(yield_batches_same_size(users, self.batch_size)):
             X = naive_sparse2tensor(train_data[user_batch, :]).to(self.device)
+
+            # Clear gradients
+            self.optimizer.zero_grad()            
 
             if self.x_to_negpos:
                 X = (X - 0.5) * 2
@@ -235,9 +235,6 @@ class RecFusion(TorchMLAlgorithm):
                 t = torch.tensor([t], dtype=torch.int32).to(self.device)
                 mu_t = self.model_.forward(Z[t+1][None, None, :, :], t+1)
                 Z_hat.append(mu_t)
-                
-            # Clear gradients
-            self.optimizer.zero_grad()
 
 
             self.update += 1
