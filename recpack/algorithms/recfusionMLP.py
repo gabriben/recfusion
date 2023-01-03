@@ -97,7 +97,7 @@ class RecFusionMLP(TorchMLAlgorithm):
     def __init__(
         self,
         stopping_criterion: str = "ndcg",
-        stop_early: bool = False,
+        stop_early: bool = True,
         max_iter_no_change: int = 5,
         min_improvement: int = 0.01,
         save_best_to_file=False,
