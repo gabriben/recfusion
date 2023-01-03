@@ -11,6 +11,7 @@ from recpack.metrics.precision import precision_k
 
 logger = logging.getLogger("recpack")
 
+import wandb
 
 class StoppingCriterion:
     """StoppingCriterion provides a wrapper around any loss function
@@ -144,6 +145,10 @@ class StoppingCriterion:
         :rtype: bool
         """
         loss = self.loss_function(X_true, X_pred, **self.kwargs)
+
+        val_metric = self.loss_function.__name__.split("_")[0]
+        K = self.kwargs['k']
+        wandb.log({'val_' + val_metric + '@' + str(K) : loss})
 
         if self.minimize:
             # If we try to minimize, smaller values of loss are better.

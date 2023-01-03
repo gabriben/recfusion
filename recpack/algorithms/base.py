@@ -664,7 +664,7 @@ class TorchMLAlgorithm(Algorithm):
         """
         start = time.time()
 
-        wandb.init(config={"model": self.name})
+        wandb.config.update({"model": self.name})
         wandb.config.update(vars(self))
 
         # Preconditions:
@@ -724,6 +724,8 @@ class TorchMLAlgorithm(Algorithm):
         self._check_fit_complete()
         end = time.time()
         logger.info(f"Fitting {self.name} complete - Took {end - start :.3}s")
+
+        # wandb.finish()
 
         return self
 

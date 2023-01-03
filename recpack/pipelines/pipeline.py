@@ -21,6 +21,7 @@ from recpack.matrix import InteractionMatrix
 
 logger = logging.getLogger("recpack")
 
+import wandb
 
 class MetricAccumulator:
     """Accumulates metrics and
@@ -214,6 +215,13 @@ class Pipeline(object):
             # Parameters are between (), so if we split on the (,
             # we can get the algorithm name by taking the first of the splits.
             df.index = df.index.map(lambda x: x.split("(")[0])
+
+        # wb = {m : v for m,v in zip(df.columns, df.values[0])}
+        for m, v in zip(df.columns, df.values[0]):
+            wandb.run.summary[m] = v
+            
+        wandb.finish()
+        
         return df
 
     def save_metrics(self) -> None:

@@ -11,6 +11,7 @@ from recpack.preprocessing.filters import (
 from recpack.matrix import InteractionMatrix
 from recpack.preprocessing.preprocessors import DataFramePreprocessor
 
+import wandb
 
 def _fetch_remote(url: str, filename: str) -> str:
     """Fetch data from remote url and save locally
@@ -71,6 +72,7 @@ class Dataset:
                 self.add_filter(f)
 
         self._ensure_path_exists()
+
 
     @property
     def file_path(self):
@@ -148,4 +150,6 @@ class Dataset:
         """
         df = self._load_dataframe()
 
+        wandb.init(config={"dataset": self.__class__.__name__})
+        
         return self.preprocessor.process(df)
