@@ -10,6 +10,7 @@ from sklearn.utils.validation import check_is_fitted
 import tempfile
 import torch
 
+import pdb
 
 from recpack.algorithms.stopping_criterion import (
     EarlyStoppingException,
@@ -21,6 +22,7 @@ from recpack.util import get_top_K_values
 
 logger = logging.getLogger("recpack")
 
+import wandb
 
 class Algorithm(BaseEstimator):
     """Base class for all recpack algorithm implementations.
@@ -661,6 +663,10 @@ class TorchMLAlgorithm(Algorithm):
         :rtype: TorchMLAlgorithm
         """
         start = time.time()
+
+        wandb.init(config={"model": self.name})
+        wandb.config.update(vars(self))
+
         # Preconditions:
         # The target for prediction is the validation data.
         assert X.shape == validation_data[0].shape
@@ -691,6 +697,7 @@ class TorchMLAlgorithm(Algorithm):
                 start_time = time.time()
                 losses = self._train_epoch(X)
                 end_time = time.time()
+                wandb.log({'train_loss' : np.mean(losses)})
                 logger.info(
                     f"Processed epoch {epoch} in {end_time-start_time :.2f} s."
                     f"Batch Training Loss = {np.mean(losses) :.4f}"
