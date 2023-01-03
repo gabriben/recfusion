@@ -103,13 +103,13 @@ class RecFusion(TorchMLAlgorithm):
         save_best_to_file=False,
         keep_last: bool = False,
         predict_topK: int = None,
-        validation_sample_size: int = None,            
+        validation_sample_size: int = None,
         batch_size: int = 200,
         max_epochs: int = 200,
         learning_rate: float = 1e-4,
-        seed: int = None,            
+        seed: int = None,
 
-        # learner: "adamax"            
+        # learner: "adamax"
 
         anneal_cap: int = 1,
         total_anneal_steps: int = 0,
@@ -123,7 +123,7 @@ class RecFusion(TorchMLAlgorithm):
         # xavier_initialization: bool = False,
         x_to_negpos: bool = False,
         # decode_from_noisiest: bool = False,
-        # p_dnns_depth: int = 4,
+        p_dnns_depth: int = 4,
         # decoder_net_depth: int = 4
     ):
 
@@ -159,6 +159,7 @@ class RecFusion(TorchMLAlgorithm):
         self.x_to_negpos = x_to_negpos
         self.update = 0
 
+        self.p_dnns_depth = p_dnns_depth
         
         # self.dropout = dropout
 
@@ -182,9 +183,11 @@ class RecFusion(TorchMLAlgorithm):
         :type dim_input_layer: int
         """
 
-        # I = X.shape[1] # number of items
+        D = X.shape[1] # number of items
 
-        self.model_ = OriginalUnet(dim = 1, channels = 1, resnet_block_groups=1, dim_mults=(1, 2)).to(self.device)
+        # self.model_ = OriginalUnet(dim = 1, channels = 1, resnet_block_groups=1, dim_mults=(1, 2)).to(self.device)
+
+        self.model_ = MLP(self.p_dnns_depth, D, self.M).to(self.device)
 
         self.optimizer = optim.Adam(self.model_.parameters(), lr=self.learning_rate)
 
@@ -233,7 +236,9 @@ class RecFusion(TorchMLAlgorithm):
                 # t = torch.FloatTensor([t]).to(self.device)
                 # pdb.set_trace()
                 t = torch.tensor([t], dtype=torch.int32).to(self.device)
-                mu_t = self.model_.forward(Z[t+1][None, None, :, :], t+1)
+                # mu_t = self.model_.forward(Z[t+1][None, None, :, :], t+1)
+                mu_t = self.model_.forward(Z[t+1])
+                
                 Z_hat.append(mu_t)
 
 
@@ -322,7 +327,8 @@ class RecFusion(TorchMLAlgorithm):
 
         t = torch.tensor([1], dtype=torch.int32).to(self.device)
 
-        out_tensor = self.model_(in_tensor[None, None, :, :], t)
+        # out_tensor = self.model_(in_tensor[None, None, :, :], t)
+        out_tensor = self.model_(in_tensor)
 
         result = lil_matrix(X.shape)
         result[users] = out_tensor.detach().cpu().numpy()
@@ -385,7 +391,41 @@ def log_normal_diag(x, mu, log_var, reduction=None, dim=None):
     else:
         return log_p    
 
-    
+
+#### MLP net
+
+
+class MLP(nn.Module):
+    def __init__(self, depth, D, M):
+        super().__init__()
+        self.m = nn.Sequential(
+            *[nn.Linear(D, M), nn.PReLU()] +
+            [nn.Linear(M, M), nn.PReLU()] * depth +
+            [nn.Linear(M, D), nn.Tanh()])
+        
+    def forward(self, x):
+        return self.m(x)
+
+# def MLP(depth, D, M):
+#     return
+#     nn.Sequential(
+#         *[nn.Linear(D, M), nn.PReLU()] +
+#         [nn.Linear(M, M), nn.PReLU()] * depth +
+#         [nn.Linear(M, D), nn.Tanh()])
+
+
+class MLPperStep(nn.Module):
+    def __init__(self, depth, steps, D, M):
+        super().__init__()
+        self.m = nn.ModuleList([nn.Sequential(
+            *[nn.Linear(D, M), nn.PReLU()] +
+            [nn.Linear(M, M), nn.PReLU()] * depth +
+            [nn.Linear(M, 2*D)]) for _ in range(steps-1)])
+        
+    def forward(self, x, t):
+        return self.m(x, t)
+
+
 #### DDPM Unet
     
 import copy
