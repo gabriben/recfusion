@@ -325,7 +325,7 @@ class RecFusion(TorchMLAlgorithm):
         in_tensor = naive_sparse2tensor(active_users).to(self.device)
 
         t = torch.tensor([1], dtype=torch.int32).to(self.device)
-
+        
         out_tensor = self.model_(in_tensor[None, None, :, :], t)
 
         result = lil_matrix(X.shape)
@@ -355,13 +355,13 @@ class RecFusion(TorchMLAlgorithm):
         
         with torch.no_grad():
             for users in get_batches(users_modulo_batch, batch_size=self.batch_size):
-                # if isinstance(X, InteractionMatrix):
-                #     batch = X.users_in(users)
-                # else:
-                batch = lil_matrix(X.shape)
-                batch[users] = X[users]
-                batch = batch.tocsr()
-
+                if isinstance(X, InteractionMatrix):
+                    batch = X.users_in(users)
+                else:
+                    batch = lil_matrix(X.shape)
+                    batch[users] = X[users]
+                    batch = batch.tocsr()
+                
                 results[users] = self._get_top_k_recommendations(self._batch_predict(batch, users=users)[users])
 
         logger.debug(f"shape of response ({results.shape})")

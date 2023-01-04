@@ -521,7 +521,7 @@ class TorchMLAlgorithm(Algorithm):
 
         if self.validation_sample_size:
             val_in, val_out = sample_rows(val_in, val_out, sample_size=self.validation_sample_size)
-
+            
         X_pred_cpu = self._predict(val_in)
         # StoppingCriterion expects csr_matrix as output
 
