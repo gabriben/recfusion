@@ -321,8 +321,6 @@ class RecFusion(TorchMLAlgorithm):
         """
 
         active_users = X[users]
-
-        pdb.set_trace()
             
         in_tensor = naive_sparse2tensor(active_users).to(self.device)
 
