@@ -211,8 +211,7 @@ class RecFusion(TorchMLAlgorithm):
         for batch_idx, user_batch in enumerate(yield_batches_same_size(users, self.batch_size)):
             X = naive_sparse2tensor(train_data[user_batch, :]).to(self.device)
 
-            # Clear gradients
-            self.optimizer.zero_grad()            
+         
 
             if self.x_to_negpos:
                 X = (X - 0.5) * 2
@@ -244,6 +243,9 @@ class RecFusion(TorchMLAlgorithm):
                 anneal = min(self.anneal_cap, 1. * self.update / self.total_anneal_steps)
             else:
                 anneal = self.anneal_cap
+
+            # Clear gradients
+            self.optimizer.zero_grad()
             
             loss = self._compute_loss(X, Z_hat, anneal)
             loss.backward()
@@ -319,6 +321,8 @@ class RecFusion(TorchMLAlgorithm):
         """
 
         active_users = X[users]
+
+        pdb.set_trace()
             
         in_tensor = naive_sparse2tensor(active_users).to(self.device)
 
@@ -343,17 +347,26 @@ class RecFusion(TorchMLAlgorithm):
         :return: The predicted affinity of users for items.
         :rtype: csr_matrix
         """
+
+        n_users = X.shape[0]
+        rep_users = self.batch_size - n_users % self.batch_size
+        users_modulo_batch = get_users(X) + [i for i in range(rep_users)]
+
+
+        import scipy
+        scipy.sparse.vstack(X, X[n_users - rep_users : n_users])
         
         results = lil_matrix(X.shape)
         self.model_.eval()
+        
         with torch.no_grad():
-            for users in get_batches(get_users(X), batch_size=self.batch_size):
-                if isinstance(X, InteractionMatrix):
-                    batch = X.users_in(users)
-                else:
-                    batch = lil_matrix(X.shape)
-                    batch[users] = X[users]
-                    batch = batch.tocsr()
+            for users in get_batches(users_modulo_batch, batch_size=self.batch_size):
+                # if isinstance(X, InteractionMatrix):
+                #     batch = X.users_in(users)
+                # else:
+                batch = lil_matrix(X.shape)
+                batch[users] = X[users]
+                batch = batch.tocsr()
 
                 results[users] = self._get_top_k_recommendations(self._batch_predict(batch, users=users)[users])
 
