@@ -150,6 +150,6 @@ class Dataset:
         """
         df = self._load_dataframe()
 
-        wandb.init(config={"dataset": self.__class__.__name__})
+        wandb.config.update({"dataset": self.__class__.__name__})
         
         return self.preprocessor.process(df)

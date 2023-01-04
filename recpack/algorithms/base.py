@@ -666,7 +666,8 @@ class TorchMLAlgorithm(Algorithm):
 
         wandb.config.update({"model": self.name})
         wandb.config.update(vars(self))
-
+        wandb.init()
+        
         # Preconditions:
         # The target for prediction is the validation data.
         assert X.shape == validation_data[0].shape
