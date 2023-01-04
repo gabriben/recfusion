@@ -351,10 +351,6 @@ class RecFusion(TorchMLAlgorithm):
         n_users = X.shape[0]
         rep_users = self.batch_size - n_users % self.batch_size
         users_modulo_batch = get_users(X) + [i for i in range(rep_users)]
-
-
-        import scipy
-        scipy.sparse.vstack(X, X[n_users - rep_users : n_users])
         
         results = lil_matrix(X.shape)
         self.model_.eval()
