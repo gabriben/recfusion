@@ -346,9 +346,9 @@ class RecFusion(TorchMLAlgorithm):
         :rtype: csr_matrix
         """
 
-        n_users = X.shape[0]
+        n_users = len(get_users(X))
         rep_users = self.batch_size - n_users % self.batch_size
-        users_modulo_batch = get_users(X) + [i for i in range(rep_users)]
+        users_modulo_batch = get_users(X) + get_users(X)[:rep_users]
         
         results = lil_matrix(X.shape)
         self.model_.eval()
