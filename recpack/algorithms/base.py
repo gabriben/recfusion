@@ -663,8 +663,7 @@ class TorchMLAlgorithm(Algorithm):
         :rtype: TorchMLAlgorithm
         """
         start = time.time()
-
-        wandb.init(mode = "online", resume=True)        
+       
         wandb.config.update({"model": self.name})
         wandb.config.update(vars(self))
         
