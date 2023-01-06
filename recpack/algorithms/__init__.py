@@ -256,3 +256,4 @@ from recpack.algorithms.tars_itemknn import TARSItemKNN, TARSItemKNNLiu
 
 from recpack.algorithms.recfusion import RecFusion
 from recpack.algorithms.recfusionMLP import RecFusionMLP
+from recpack.algorithms.recfusionMLPT import RecFusionMLPT

@@ -725,8 +725,6 @@ class TorchMLAlgorithm(Algorithm):
         end = time.time()
         logger.info(f"Fitting {self.name} complete - Took {end - start :.3}s")
 
-        # wandb.finish()
-
         return self
 
     def _check_prediction(self, X_pred: csr_matrix, X: Matrix) -> None:
