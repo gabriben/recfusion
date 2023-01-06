@@ -421,7 +421,7 @@ def calc_t_emb(ts, t_dim):
     half_dim = t_dim // 2
     emb = math.log(10000) / (half_dim - 1)
     emb = torch.exp(torch.arange(half_dim) * -emb)
-    emb = emb.to(self.device)
+    emb = emb.to(ts.device)
     emb = ts * emb
     emb = torch.cat((emb.sin(), emb.cos()), dim=-1)
     return emb
