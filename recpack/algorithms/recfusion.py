@@ -847,7 +847,7 @@ class OriginalUnet(nn.Module):
             x = downsample(x)
 
         x = self.mid_block1(x, t)
-        x = self.mid_attn(x)
+        # x = self.mid_attn(x)
         x = self.mid_block2(x, t)
 
         for block1, block2, attn, upsample in self.ups:
