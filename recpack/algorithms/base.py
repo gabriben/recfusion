@@ -664,9 +664,9 @@ class TorchMLAlgorithm(Algorithm):
         """
         start = time.time()
 
+        wandb.init(mode = "online", resume=True)        
         wandb.config.update({"model": self.name})
         wandb.config.update(vars(self))
-        wandb.init()
         
         # Preconditions:
         # The target for prediction is the validation data.

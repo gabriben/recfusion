@@ -150,6 +150,10 @@ class Dataset:
         """
         df = self._load_dataframe()
 
-        wandb.config.update({"dataset": self.__class__.__name__})
+        # wandb.config.update({"dataset": self.__class__.__name__})
+        try:
+            wandb.config.dataset = self.__class__.__name__
+        except:
+            print("no wandb initiated")
         
         return self.preprocessor.process(df)

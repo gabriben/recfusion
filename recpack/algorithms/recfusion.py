@@ -211,8 +211,6 @@ class RecFusion(TorchMLAlgorithm):
         for batch_idx, user_batch in enumerate(yield_batches_same_size(users, self.batch_size)):
             X = naive_sparse2tensor(train_data[user_batch, :]).to(self.device)
 
-         
-
             if self.x_to_negpos:
                 X = (X - 0.5) * 2
 
@@ -230,11 +228,8 @@ class RecFusion(TorchMLAlgorithm):
             Z_hat = []
 
             for t in range(self.T - 1):
-                # t = torch.FloatTensor([t]).to(self.device)
-                # pdb.set_trace()
                 t = torch.tensor([t], dtype=torch.int32).to(self.device)
-                mu_t = self.model_.forward(Z[t+1][None, None, :, :], t+1)
-                
+                mu_t = self.model_.forward(Z[t+1][None, None, :, :], t+1)   
                 Z_hat.append(mu_t)
 
 
