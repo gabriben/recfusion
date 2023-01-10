@@ -234,7 +234,7 @@ class RecFusionMLP(TorchMLAlgorithm):
             # Z_mu_hat =[]
             # Z_var_hat = []
 
-            for t in range(self.T):
+            for t in range(self.T - 1):
                 # t = torch.FloatTensor([t]).to(self.device)
                 # pdb.set_trace()
                 t = torch.tensor([t], dtype=torch.int32).to(self.device)
