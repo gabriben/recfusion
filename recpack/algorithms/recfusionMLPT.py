@@ -232,14 +232,14 @@ class RecFusionMLPT(TorchMLAlgorithm):
 
             Z_hat = []
 
-            for t in range(self.T - 1):
+            for t in range(self.T):
                 # t = torch.FloatTensor([t]).to(self.device)
                 # pdb.set_trace()
                 t = torch.tensor([t], dtype=torch.int32).to(self.device)
                 # mu_t = self.model_.forward(Z[t+1][None, None, :, :], t+1)
-                mu_t = self.model_.forward(Z[t+1], t+1)
+                h = self.model_.forward(Z[t], t)
                 
-                Z_hat.append(mu_t)
+                Z_hat.append(h)
 
 
             self.update += 1
