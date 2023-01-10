@@ -231,15 +231,25 @@ class RecFusionMLP(TorchMLAlgorithm):
             # backward diffusion
 
             Z_hat = []
+            # Z_mu_hat =[]
+            # Z_var_hat = []
 
-            for t in range(self.T - 1):
+            for t in range(self.T):
                 # t = torch.FloatTensor([t]).to(self.device)
                 # pdb.set_trace()
                 t = torch.tensor([t], dtype=torch.int32).to(self.device)
-                # mu_t = self.model_.forward(Z[t+1][None, None, :, :], t+1)
-                mu_t = self.model_.forward(Z[t+1])
+
+                h = self.model_.forward(Z[t+1])
+
+                Z_hat.append(h)
                 
-                Z_hat.append(mu_t)
+                # Z_mu_hat_i, Z_var_hat_i = torch.chunk(h, 2, dim=1)
+
+                # Z_mu_hat.append(Z_mu_hat_i)
+                # Z_var_hat.append(Z_var_hat_i)
+
+            # h = self.model_.forward(Z[0])
+            # X_hat, _ = torch.chunk(h, 2, dim=1)
 
 
             self.update += 1
@@ -248,7 +258,8 @@ class RecFusionMLP(TorchMLAlgorithm):
             else:
                 anneal = self.anneal_cap
             
-            loss = self._compute_loss(X, Z_hat, anneal)
+            # loss = self._compute_loss(X, X_hat, Z_hat, anneal)
+            loss = self._compute_loss(X, Z_hat, anneal)            
             loss.backward()
             losses.append(loss.item())
             self.optimizer.step()
@@ -403,6 +414,7 @@ class MLP(nn.Module):
             *[nn.Linear(D, M), nn.PReLU()] +
             [nn.Linear(M, M), nn.PReLU()] * depth +
             [nn.Linear(M, D), nn.Tanh()])
+            # [nn.Linear(M, 2*D)]
         
     def forward(self, x):
         return self.m(x)
