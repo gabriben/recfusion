@@ -231,8 +231,6 @@ class RecFusionMLP(TorchMLAlgorithm):
             # backward diffusion
 
             Z_hat = []
-            # Z_mu_hat = []
-            # Z_var_hat = []
 
             for t in range(self.T):
 
@@ -241,14 +239,6 @@ class RecFusionMLP(TorchMLAlgorithm):
                 h = self.model_.forward(Z[t])
 
                 Z_hat.append(h)
-                
-            #     Z_mu_hat_i, Z_var_hat_i = torch.chunk(h, 2, dim=1)
-
-            #     Z_mu_hat.append(Z_mu_hat_i)
-            #     Z_var_hat.append(Z_var_hat_i)
-
-            # h = self.model_.forward(Z[0])
-            # X_hat, _ = torch.chunk(h, 2, dim=1)
 
 
             self.update += 1
@@ -257,8 +247,6 @@ class RecFusionMLP(TorchMLAlgorithm):
             else:
                 anneal = self.anneal_cap
             
-            # loss = self._compute_loss(X, X_hat,
-            #                           Z_mu_hat, Z_var_hat, anneal)
             loss = self._compute_loss(X, Z_hat, anneal)            
             loss.backward()
             losses.append(loss.item())
@@ -296,15 +284,12 @@ class RecFusionMLP(TorchMLAlgorithm):
         # Normal RE
         # RE = log_standard_normal(x - mu_x).sum(-1)
         RE = log_standard_normal(X - Z_hat[0]).sum(-1)
-
-        KL = 0.0
-        
-        
+         
         # KL
         KL = (log_normal_diag(Z_hat[-1], torch.sqrt(1. - self.betas[0]) * Z_hat[-1],
                               torch.log(self.betas[0])) - log_standard_normal(Z_hat[-1])).sum(-1)
-
-        for i in range(1, len(Z_hat) - 1):
+    
+        for i in range(len(Z_hat)):
             KL_i = (log_normal_diag(Z_hat[i], torch.sqrt(1. - self.betas[i]) * Z_hat[i],
                               torch.log(self.betas[i])) - log_standard_normal(Z_hat[i])).sum(-1)
         
