@@ -120,11 +120,13 @@ class RecFusionMLP(TorchMLAlgorithm):
         schedule_type: str = "quadratic",
         reduction: str = "avg",
 
-        # xavier_initialization: bool = False,
+        xavier_initialization: bool = False,
         x_to_negpos: bool = False,
         # decode_from_noisiest: bool = False,
         p_dnns_depth: int = 4,
         # decoder_net_depth: int = 4
+
+        accumulate_batches: int = None
     ):
 
         super().__init__(
@@ -160,6 +162,10 @@ class RecFusionMLP(TorchMLAlgorithm):
         self.update = 0
 
         self.p_dnns_depth = p_dnns_depth
+
+        self.xavier_initialization = xavier_initialization
+
+        self.accumulate_batches = accumulate_batches
         
         # self.dropout = dropout
 
@@ -188,6 +194,9 @@ class RecFusionMLP(TorchMLAlgorithm):
         # self.model_ = OriginalUnet(dim = 1, channels = 1, resnet_block_groups=1, dim_mults=(1, 2)).to(self.device)
 
         self.model_ = MLP(self.p_dnns_depth, D, self.M).to(self.device)
+
+        if self.xavier_initialization:
+            init_weights(self.model_)
 
         self.optimizer = optim.Adam(self.model_.parameters(), lr=self.learning_rate)
 
@@ -231,8 +240,6 @@ class RecFusionMLP(TorchMLAlgorithm):
             # backward diffusion
 
             Z_hat = []
-            # Z_mu_hat = []
-            # Z_var_hat = []
 
             for t in range(self.T):
 
@@ -241,14 +248,6 @@ class RecFusionMLP(TorchMLAlgorithm):
                 h = self.model_.forward(Z[t])
 
                 Z_hat.append(h)
-                
-            #     Z_mu_hat_i, Z_var_hat_i = torch.chunk(h, 2, dim=1)
-
-            #     Z_mu_hat.append(Z_mu_hat_i)
-            #     Z_var_hat.append(Z_var_hat_i)
-
-            # h = self.model_.forward(Z[0])
-            # X_hat, _ = torch.chunk(h, 2, dim=1)
 
 
             self.update += 1
@@ -257,12 +256,13 @@ class RecFusionMLP(TorchMLAlgorithm):
             else:
                 anneal = self.anneal_cap
             
-            # loss = self._compute_loss(X, X_hat,
-            #                           Z_mu_hat, Z_var_hat, anneal)
             loss = self._compute_loss(X, Z_hat, anneal)            
             loss.backward()
             losses.append(loss.item())
-            self.optimizer.step()
+
+            if self.accumulate_batches is not None:
+                if batch_idx % self.accumulate_batches == 0:
+                    self.optimizer.step()
 
             self.steps += 1
 
@@ -296,12 +296,12 @@ class RecFusionMLP(TorchMLAlgorithm):
         # Normal RE
         # RE = log_standard_normal(x - mu_x).sum(-1)
         RE = log_standard_normal(X - Z_hat[0]).sum(-1)
-
+         
         # KL
         KL = (log_normal_diag(Z_hat[-1], torch.sqrt(1. - self.betas[0]) * Z_hat[-1],
                               torch.log(self.betas[0])) - log_standard_normal(Z_hat[-1])).sum(-1)
-
-        for i in range(1, len(Z_hat) - 1):
+    
+        for i in range(len(Z_hat)):
             KL_i = (log_normal_diag(Z_hat[i], torch.sqrt(1. - self.betas[i]) * Z_hat[i],
                               torch.log(self.betas[i])) - log_standard_normal(Z_hat[i])).sum(-1)
         
@@ -358,6 +358,10 @@ class RecFusionMLP(TorchMLAlgorithm):
         :return: The predicted affinity of users for items.
         :rtype: csr_matrix
         """
+
+        # n_users = len(get_users(X))
+        # rep_users = self.batch_size - n_users % self.batch_size
+        # users_modulo_batch = get_users(X) + get_users(X)[:rep_users]        
         
         results = lil_matrix(X.shape)
         self.model_.eval()
@@ -418,3 +422,16 @@ class MLP(nn.Module):
         
     def forward(self, x):
         return self.m(x)
+
+    
+def init_weights(m):
+    for layer in m:
+        # Xavier Initialization for weights
+        size = layer[0].weight.size()
+        fan_out = size[0]
+        fan_in = size[1]
+        std = np.sqrt(2.0/(fan_in + fan_out))
+        layer[0].weight.data.normal_(0.0, 0.0001)
+
+        # Normal Initialization for Biases
+        layer[0].bias.data.normal_(0.0, 0.0001)    
