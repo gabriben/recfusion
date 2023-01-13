@@ -120,11 +120,13 @@ class RecFusionMLP(TorchMLAlgorithm):
         schedule_type: str = "quadratic",
         reduction: str = "avg",
 
-        # xavier_initialization: bool = False,
+        xavier_initialization: bool = False,
         x_to_negpos: bool = False,
         # decode_from_noisiest: bool = False,
         p_dnns_depth: int = 4,
         # decoder_net_depth: int = 4
+
+        accumulate_batches: int = None
     ):
 
         super().__init__(
@@ -160,6 +162,10 @@ class RecFusionMLP(TorchMLAlgorithm):
         self.update = 0
 
         self.p_dnns_depth = p_dnns_depth
+
+        self.xavier_initialization = xavier_initialization
+
+        self.accumulate_batches = accumulate_batches
         
         # self.dropout = dropout
 
@@ -188,6 +194,9 @@ class RecFusionMLP(TorchMLAlgorithm):
         # self.model_ = OriginalUnet(dim = 1, channels = 1, resnet_block_groups=1, dim_mults=(1, 2)).to(self.device)
 
         self.model_ = MLP(self.p_dnns_depth, D, self.M).to(self.device)
+
+        if self.xavier_initialization:
+            init_weights(self.model_)
 
         self.optimizer = optim.Adam(self.model_.parameters(), lr=self.learning_rate)
 
@@ -250,7 +259,10 @@ class RecFusionMLP(TorchMLAlgorithm):
             loss = self._compute_loss(X, Z_hat, anneal)            
             loss.backward()
             losses.append(loss.item())
-            self.optimizer.step()
+
+            if self.accumulate_batches is not None:
+                if batch_idx % self.accumulate_batches == 0:
+                    self.optimizer.step()
 
             self.steps += 1
 
@@ -406,3 +418,16 @@ class MLP(nn.Module):
         
     def forward(self, x):
         return self.m(x)
+
+    
+def init_weights(m):
+    for layer in m:
+        # Xavier Initialization for weights
+        size = layer[0].weight.size()
+        fan_out = size[0]
+        fan_in = size[1]
+        std = np.sqrt(2.0/(fan_in + fan_out))
+        layer[0].weight.data.normal_(0.0, 0.0001)
+
+        # Normal Initialization for Biases
+        layer[0].bias.data.normal_(0.0, 0.0001)    
