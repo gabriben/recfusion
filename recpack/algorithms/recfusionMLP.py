@@ -219,11 +219,12 @@ class RecFusionMLP(TorchMLAlgorithm):
 
         np.random.shuffle(users)
 
-        for batch_idx, user_batch in enumerate(yield_batches_same_size(users, self.batch_size)):
+        data_loader = yield_batches_same_size(users, self.batch_size)
+        
+        for batch_idx, user_batch in enumerate(data_loader):
             X = naive_sparse2tensor(train_data[user_batch, :]).to(self.device)
 
-            # Clear gradients
-            self.optimizer.zero_grad()           
+                      
 
             if self.x_to_negpos:
                 X = (X - 0.5) * 2
@@ -261,8 +262,12 @@ class RecFusionMLP(TorchMLAlgorithm):
             losses.append(loss.item())
 
             if self.accumulate_batches is not None:
-                if batch_idx % self.accumulate_batches == 0:
+                if (batch_idx + 1 % self.accumulate_batches == 0) or (batch_idx + 1 == len(data_loader)):
                     self.optimizer.step()
+                    # Clear gradients
+                    self.optimizer.zero_grad()
+            else:
+                self.optimizer.zero_grad() 
 
             self.steps += 1
 
