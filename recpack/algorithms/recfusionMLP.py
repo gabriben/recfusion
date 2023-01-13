@@ -221,8 +221,6 @@ class RecFusionMLP(TorchMLAlgorithm):
 
         n_batches =  len([b for b, _ in enumerate(yield_batches_same_size(users, self.batch_size))])
         data_loader = yield_batches_same_size(users, self.batch_size)
-        import pdb
-        pdb.set_trace()
         
         for batch_idx, user_batch in enumerate(data_loader):
             X = naive_sparse2tensor(train_data[user_batch, :]).to(self.device)
