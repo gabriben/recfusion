@@ -68,6 +68,7 @@ from recpack.datasets.cite_u_like import CiteULike
 from recpack.datasets.cosmetics_shop import CosmeticsShop
 from recpack.datasets.dummy_dataset import DummyDataset
 from recpack.datasets.movielens import MovieLens25M
+from recpack.datasets.movielens20m import MovieLens20M
 from recpack.datasets.movieLens100k import MovieLens100K
 from recpack.datasets.movielens1m import MovieLens1M
 from recpack.datasets.netflix import Netflix
