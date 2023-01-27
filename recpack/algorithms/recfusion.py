@@ -125,6 +125,9 @@ class RecFusion(TorchMLAlgorithm):
         # decode_from_noisiest: bool = False,
         p_dnns_depth: int = 4,
         # decoder_net_depth: int = 4
+
+        accumulate_batches: int = None
+            
     ):
 
         super().__init__(
@@ -160,6 +163,8 @@ class RecFusion(TorchMLAlgorithm):
         self.update = 0
 
         self.p_dnns_depth = p_dnns_depth
+
+        self.accumulate_batches = accumulate_batches
         
         # self.dropout = dropout
 
@@ -245,7 +250,15 @@ class RecFusion(TorchMLAlgorithm):
             loss = self._compute_loss(X, Z_hat, anneal)
             loss.backward()
             losses.append(loss.item())
-            self.optimizer.step()
+
+            if self.accumulate_batches is not None:
+                if (batch_idx + 1 % self.accumulate_batches == 0) or (batch_idx + 1 == n_batches):
+                    self.optimizer.step()
+                    # Clear gradients
+                    self.optimizer.zero_grad()
+            else:
+                self.optimizer.step() 
+                self.optimizer.zero_grad() 
 
             self.steps += 1
 
