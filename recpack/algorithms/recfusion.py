@@ -213,6 +213,9 @@ class RecFusion(TorchMLAlgorithm):
 
         np.random.shuffle(users)
 
+        n_batches =  len([b for b, _ in enumerate(yield_batches_same_size(users, self.batch_size))])
+        data_loader = yield_batches_same_size(users, self.batch_size)        
+
         for batch_idx, user_batch in enumerate(yield_batches_same_size(users, self.batch_size)):
             X = naive_sparse2tensor(train_data[user_batch, :]).to(self.device)
 
