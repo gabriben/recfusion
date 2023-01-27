@@ -125,6 +125,9 @@ class RecFusionMLPT(TorchMLAlgorithm):
         # decode_from_noisiest: bool = False,
         p_dnns_depth: int = 4,
         # decoder_net_depth: int = 4
+
+        accumulate_batches: int = None
+            
     ):
 
         super().__init__(
@@ -160,6 +163,8 @@ class RecFusionMLPT(TorchMLAlgorithm):
         self.update = 0
 
         self.p_dnns_depth = p_dnns_depth
+
+        self.accumulate_batches = accumulate_batches
         
         # self.dropout = dropout
 
@@ -210,6 +215,9 @@ class RecFusionMLPT(TorchMLAlgorithm):
 
         np.random.shuffle(users)
 
+        n_batches =  len([b for b, _ in enumerate(yield_batches_same_size(users, self.batch_size))])
+        data_loader = yield_batches_same_size(users, self.batch_size)     
+        
         for batch_idx, user_batch in enumerate(yield_batches_same_size(users, self.batch_size)):
             X = naive_sparse2tensor(train_data[user_batch, :]).to(self.device)
 
@@ -251,7 +259,15 @@ class RecFusionMLPT(TorchMLAlgorithm):
             loss = self._compute_loss(X, Z_hat, anneal)
             loss.backward()
             losses.append(loss.item())
-            self.optimizer.step()
+
+            if self.accumulate_batches is not None:
+                if (batch_idx + 1 % self.accumulate_batches == 0) or (batch_idx + 1 == n_batches):
+                    self.optimizer.step()
+                    # Clear gradients
+                    self.optimizer.zero_grad()
+            else:
+                self.optimizer.step() 
+                self.optimizer.zero_grad()             
 
             self.steps += 1
 
