@@ -268,6 +268,7 @@ class RecFusionMLP(TorchMLAlgorithm):
                     # Clear gradients
                     self.optimizer.zero_grad()
             else:
+                self.optimizer.step() 
                 self.optimizer.zero_grad() 
 
             self.steps += 1
