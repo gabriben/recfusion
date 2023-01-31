@@ -403,7 +403,7 @@ def log_normal_diag(x, mu, log_var, reduction=None, dim=None):
 #         super().__init__()
 #         self.m = nn.Sequential(
 #             *[nn.Linear(D, M), nn.PReLU()] +
-#             [nn.Linear(M, M), nn.PReLU()] * depth +
+#             [nn.Linea\r(M, M), nn.PReLU()] * depth +
 #             [nn.Linear(M, D), nn.Tanh()])
         
 #     def forward(self, x):

@@ -151,7 +151,7 @@ class Dataset:
         df = self._load_dataframe()
 
         # wandb.config.update({"dataset": self.__class__.__name__})
-        if wandb.run is not None:
-            wandb.config.dataset = self.__class__.__name__
+        # if wandb.run is not None:
+        #     wandb.config.dataset = self.__class__.__name__
         
         return self.preprocessor.process(df)
