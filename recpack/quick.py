@@ -1,4 +1,5 @@
 from recpackfusion.recpack.datasets import *
+from recpack.scenarios.splitters import *
 from recpack.scenarios import WeakGeneralization, StrongGeneralization
 from recpack.pipelines import PipelineBuilder
 import pandas as pd
@@ -27,7 +28,15 @@ def quick_train(model: str,
     d.add_filter(MinUsersPerItem(prep_hypers['min_users_per_item'], d.ITEM_IX, d.USER_IX))
     x = d.load()
 
-    scenario = eval(prep_hypers['generalization'])(prep_hypers['train_prop'], validation=True)
+    train, val, test = prep_hypers["train_val_test"]
+    train_val = train + val
+
+    # first split train_val and test
+    scenario = eval(prep_hypers['generalization'])(train_val, validation=True)
+    # then split train and val from train_val
+    scenario.validation_splitter = eval(prep_hypers['generalization'] + 'Splitter')(in_frac=train/train_val, seed=scenario.seed)
+    # e.g. 0.9 [train-val] * 0.88 -> 0.8 [train] / 0.1 [val]
+
     scenario.split(x)
     builder = PipelineBuilder()
     builder.set_data_from_scenario(scenario)
