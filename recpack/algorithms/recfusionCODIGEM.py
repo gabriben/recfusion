@@ -117,7 +117,7 @@ class CODIGEM(TorchMLAlgorithm):
         M: int = 200,
         b_start: float = 0.0001,
         b_end: float = 0.0001,
-        schedule_type: str = "quadratic",
+        schedule_type: str = "linear",
         reduction: str = "avg",
 
         # xavier_initialization: bool = False,
@@ -226,7 +226,7 @@ class CODIGEM(TorchMLAlgorithm):
 
             Z = [make_noise(X, 0, self.betas[0])]
 
-            for i in range(1, self.T):
+            for i in range(1, self.T - 1):
                 Z.append(make_noise(Z[-1], i, self.betas[i]))  
 
             # =====
