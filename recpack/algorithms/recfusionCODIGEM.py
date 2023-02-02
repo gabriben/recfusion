@@ -120,7 +120,7 @@ class CODIGEM(TorchMLAlgorithm):
         schedule_type: str = "linear",
         reduction: str = "avg",
 
-        # xavier_initialization: bool = False,
+        xavier_initialization: bool = False,
         x_to_negpos: bool = False,
         # decode_from_noisiest: bool = False,
         p_dnns_depth: int = 4,
@@ -160,6 +160,8 @@ class CODIGEM(TorchMLAlgorithm):
         self.update = 0
 
         self.p_dnns_depth = p_dnns_depth
+
+        self.xavier_initialization = xavier_initialization
         
         # self.dropout = dropout
 
@@ -190,7 +192,8 @@ class CODIGEM(TorchMLAlgorithm):
         # self.mlp = MLP(self.p_dnns_depth, D, self.M).to(self.device)
         self.model_ = MLPPerStep(self.p_dnns_depth, self.T - 1 , D, self.M).to(self.device)
 
-        self.init_weights()
+        if self.xavier_initialization:
+            self.init_weights()
 
         # params = list(self.mlp.parameters()) + list(self.mlp_step.parameters())
         self.optimizer = optim.Adam(self.model_.parameters(), lr=self.learning_rate)
