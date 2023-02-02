@@ -168,7 +168,7 @@ class MultVAE(TorchMLAlgorithm):
 
     def _train_epoch(self, train_data: csr_matrix):
         """
-        Perform one training epoch.
+        Perform one training epoch
         Data is processed in batches of self.batch_size users.
 
         :param train_data: Training data (UxI)

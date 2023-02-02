@@ -190,9 +190,36 @@ class CODIGEM(TorchMLAlgorithm):
         # self.mlp = MLP(self.p_dnns_depth, D, self.M).to(self.device)
         self.model_ = MLPPerStep(self.p_dnns_depth, self.T - 1 , D, self.M).to(self.device)
 
+        self.init_weights()
+
         # params = list(self.mlp.parameters()) + list(self.mlp_step.parameters())
         self.optimizer = optim.Adam(self.model_.parameters(), lr=self.learning_rate)
 
+    def init_weights(self):
+        for layer in self.model_.m[0:-1]:
+            # Xavier Initialization for weights
+            size = layer[0].weight.size()
+            fan_out = size[0]
+            fan_in = size[1]
+            std = np.sqrt(2.0/(fan_in + fan_out))
+            layer[0].weight.data.normal_(0.0, 0.0001)
+
+            # Normal Initialization for Biases
+            layer[0].bias.data.normal_(0.0, 0.0001)
+
+        for layer in self.model_.m[-1]:
+            # Xavier Initialization for weights
+            if str(layer) == "Linear":
+                size = layer.weight.size()
+                fan_out = size[0]
+                fan_in = size[1]
+                std = np.sqrt(2.0/(fan_in + fan_out))
+                layer.weight.data.normal_(0.0, 0.0001)
+
+                # Normal Initialization for Biases
+                layer.bias.data.normal_(0.0, 0.0001)
+
+            
     def _train_epoch(self, train_data: csr_matrix):
         """
         Perform one training epoch.
@@ -421,3 +448,4 @@ class MLPPerStep(nn.Module):
         
     def forward(self, x):
         return self.m(x)
+
