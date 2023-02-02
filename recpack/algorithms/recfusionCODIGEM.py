@@ -188,7 +188,9 @@ class CODIGEM(TorchMLAlgorithm):
         # self.model_ = OriginalUnet(dim = 1, channels = 1, resnet_block_groups=1, dim_mults=(1, 2)).to(self.device)
 
         # self.mlp = MLP(self.p_dnns_depth, D, self.M).to(self.device)
-        self.model_ = MLPPerStep(self.p_dnns_depth, self.T, D, self.M).to(self.device)        
+        self.model_ = MLPPerStep(self.p_dnns_depth, self.T, D, self.M).to(self.device)
+
+        pdb.set_trace()
 
         # params = list(self.mlp.parameters()) + list(self.mlp_step.parameters())
         self.optimizer = optim.Adam(self.model_.parameters(), lr=self.learning_rate)
