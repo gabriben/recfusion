@@ -116,7 +116,7 @@ class CODIGEM(TorchMLAlgorithm):
         T: int = 3,
         M: int = 200,
         b_start: float = 0.0001,
-        b_end: float = 0.1,
+        b_end: float = 0.0001,
         schedule_type: str = "quadratic",
         reduction: str = "avg",
 
@@ -145,7 +145,7 @@ class CODIGEM(TorchMLAlgorithm):
         self.b_start = b_start
         self.b_end = b_end
         self.schedule_type = schedule_type
-        betas = self.get_beta_schedule(b_start, b_end, T, schedule_type)
+        betas = self.get_beta_schedule(b_start, b_end, T - 1, schedule_type)
         self.betas = torch.FloatTensor(betas).to(self.device)
 
         self.steps = 0
