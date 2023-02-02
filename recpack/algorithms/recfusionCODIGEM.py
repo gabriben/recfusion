@@ -235,7 +235,7 @@ class CODIGEM(TorchMLAlgorithm):
             Z_mu_hat = []
             Z_var_hat = []
 
-            for t in range(self.T):
+            for t in range(self.T - 1):
                 h = self.model_.m[t](Z[t])
                 Z_mu_hat_i, Z_var_hat_i = torch.chunk(h, 2, dim=1)
 
