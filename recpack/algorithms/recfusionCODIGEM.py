@@ -190,6 +190,7 @@ class CODIGEM(TorchMLAlgorithm):
         # self.mlp = MLP(self.p_dnns_depth, D, self.M).to(self.device)
         self.model_ = MLPPerStep(self.p_dnns_depth, self.T, D, self.M).to(self.device)
 
+        import pdb
         pdb.set_trace()
 
         # params = list(self.mlp.parameters()) + list(self.mlp_step.parameters())
