@@ -37,6 +37,9 @@ def quick_train(model: str,
     scenario.validation_splitter = eval(prep_hypers['generalization'] + 'Splitter')(in_frac=train/train_val, seed=scenario.seed)
     # e.g. 0.9 [train-val] * 0.88 -> 0.8 [train] / 0.1 [val]
 
+    import pdb
+    pdb.set_trace()
+
     scenario.split(x)
     builder = PipelineBuilder()
     builder.set_data_from_scenario(scenario)
