@@ -122,6 +122,7 @@ class CODIGEM(TorchMLAlgorithm):
 
         xavier_initialization: bool = False,
         x_to_negpos: bool = False,
+        reparametrization_mu: bool = False,
         # decode_from_noisiest: bool = False,
         p_dnns_depth: int = 4,
         # decoder_net_depth: int = 4
@@ -162,6 +163,8 @@ class CODIGEM(TorchMLAlgorithm):
         self.p_dnns_depth = p_dnns_depth
 
         self.xavier_initialization = xavier_initialization
+
+        self.reparametrization_mu = reparametrization_mu
         
         # self.dropout = dropout
 
@@ -198,6 +201,7 @@ class CODIGEM(TorchMLAlgorithm):
         # params = list(self.mlp.parameters()) + list(self.mlp_step.parameters())
         self.optimizer = optim.Adam(self.model_.parameters(), lr=self.learning_rate)
 
+    # Maybe remove this . It was in CODIGEM, but doesn't seem to make a difference
     def init_weights(self):
         for layer in self.model_.m[0:-1]:
             # Xavier Initialization for weights
@@ -268,6 +272,9 @@ class CODIGEM(TorchMLAlgorithm):
             for t in range(self.T - 1):
                 h = self.model_.m[t](Z[t])
                 Z_mu_hat_i, Z_var_hat_i = torch.chunk(h, 2, dim=1)
+
+                if self.reparametrization_mu:
+                    Z_mu_hat_i = reparameterization(Z_mu_hat_i, Z_var_hat_i)
 
                 Z_mu_hat.append(Z_mu_hat_i)
                 Z_var_hat.append(Z_var_hat_i)
@@ -421,6 +428,10 @@ def log_normal_diag(x, mu, log_var, reduction=None, dim=None):
     else:
         return log_p    
 
+def reparameterization(mu, log_var):
+    std = torch.exp(0.5*log_var)
+    eps = torch.randn_like(std)
+    return mu + std * eps
 
 #### MLP net
 
