@@ -34,7 +34,10 @@ def quick_train(model: str,
     
     scenario = eval(prep_hypers['generalization'])(train_val, validation=True)
     # then split train and val from train_val
-    scenario.validation_splitter = eval(prep_hypers['generalization'] + 'Splitter')(in_frac=train/train_val, seed=scenario.seed)
+    if prep_hypers['generalization'] == 'StrongGeneralization':
+        scenario.validation_splitter = StrongGeneralizationSplitter(in_frac=train/train_val, seed=scenario.seed)
+    elif prep_hypers['generalization'] == 'WeakGeneralization':
+        scenario.validation_splitter = FractionInteractionSplitter(in_frac=train/train_val, seed=scenario.seed)
     # e.g. 0.9 [train-val] * 0.88 -> 0.8 [train] / 0.1 [val]
 
     scenario.split(x)
