@@ -286,6 +286,9 @@ class CODIGEM(TorchMLAlgorithm):
                 anneal = min(self.anneal_cap, 1. * self.update / self.total_anneal_steps)
             else:
                 anneal = self.anneal_cap
+
+            import pdb
+            pdb.set_trace()
             
             loss = self._compute_loss(X, X_hat,
                                       Z, Z_mu_hat, Z_var_hat,
@@ -327,7 +330,7 @@ class CODIGEM(TorchMLAlgorithm):
         # RE
 
         # Normal RE
-        RE = log_standard_normal(X - X_hat[0]).sum(-1)
+        RE = log_standard_normal(X - X_hat).sum(-1)
 
         # KL
         KL = (log_normal_diag(Z[-1], torch.sqrt(1. - self.betas[0]) * Z[-1],

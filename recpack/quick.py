@@ -1,4 +1,4 @@
-from recpackfusion.recpack.datasets import *
+from recpack.datasets import *
 from recpack.scenarios.splitters import *
 from recpack.scenarios import WeakGeneralization, StrongGeneralization
 from recpack.pipelines import PipelineBuilder
