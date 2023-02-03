@@ -286,9 +286,6 @@ class CODIGEM(TorchMLAlgorithm):
                 anneal = min(self.anneal_cap, 1. * self.update / self.total_anneal_steps)
             else:
                 anneal = self.anneal_cap
-
-            import pdb
-            pdb.set_trace()
             
             loss = self._compute_loss(X, X_hat,
                                       Z, Z_mu_hat, Z_var_hat,
