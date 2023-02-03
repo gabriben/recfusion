@@ -294,7 +294,7 @@ class RecFusionMLPVar(TorchMLAlgorithm):
         # RE
 
         # Normal RE
-        RE = log_standard_normal(X - X_hat[0]).sum(-1)
+        RE = log_standard_normal(X - X_hat).sum(-1)
 
         # KL
         KL = (log_normal_diag(Z[-1], torch.sqrt(1. - self.betas[0]) * Z[-1],
