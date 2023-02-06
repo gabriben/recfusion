@@ -156,8 +156,8 @@ class RecFusionMLP(TorchMLAlgorithm):
         self.total_anneal_steps = total_anneal_steps
         self.T = T
         self.M = M
-        self.schedule_type = schedule_type,
-        self.reduction = reduction,
+        self.schedule_type = schedule_type
+        self.reduction = reduction
         self.x_to_negpos = x_to_negpos
         self.update = 0
 
@@ -190,6 +190,9 @@ class RecFusionMLP(TorchMLAlgorithm):
         """
 
         D = X.shape[1] # number of items
+
+        if self.M == "D":
+            self.M = D
 
         # self.model_ = OriginalUnet(dim = 1, channels = 1, resnet_block_groups=1, dim_mults=(1, 2)).to(self.device)
 
