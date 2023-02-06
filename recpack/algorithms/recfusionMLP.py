@@ -346,7 +346,7 @@ class RecFusionMLP(TorchMLAlgorithm):
             
         in_tensor = naive_sparse2tensor(active_users).to(self.device)
 
-        t = torch.tensor([1], dtype=torch.int32).to(self.device)
+        # t = torch.tensor([1], dtype=torch.int32).to(self.device)
 
         # out_tensor = self.model_(in_tensor[None, None, :, :], t)
         out_tensor = self.model_(in_tensor)
@@ -357,38 +357,38 @@ class RecFusionMLP(TorchMLAlgorithm):
         return result.tocsr()
 
 
-    def _predict(self, X: Matrix) -> csr_matrix:
-        """Compute predictions per batch of users,
-        to avoid going out of RAM on the GPU
+    # def _predict(self, X: Matrix) -> csr_matrix:
+    #     """Compute predictions per batch of users,
+    #     to avoid going out of RAM on the GPU
 
-        Will batch the nonzero users into batches of self.batch_size.
+    #     Will batch the nonzero users into batches of self.batch_size.
 
-        :param X: The input user interaction matrix
-        :type X: csr_matrix
-        :return: The predicted affinity of users for items.
-        :rtype: csr_matrix
-        """
+    #     :param X: The input user interaction matrix
+    #     :type X: csr_matrix
+    #     :return: The predicted affinity of users for items.
+    #     :rtype: csr_matrix
+    #     """
 
-        # n_users = len(get_users(X))
-        # rep_users = self.batch_size - n_users % self.batch_size
-        # users_modulo_batch = get_users(X) + get_users(X)[:rep_users]        
+    #     # n_users = len(get_users(X))
+    #     # rep_users = self.batch_size - n_users % self.batch_size
+    #     # users_modulo_batch = get_users(X) + get_users(X)[:rep_users]        
         
-        results = lil_matrix(X.shape)
-        self.model_.eval()
-        with torch.no_grad():
-            for users in get_batches(get_users(X), batch_size=self.batch_size):
-                if isinstance(X, InteractionMatrix):
-                    batch = X.users_in(users)
-                else:
-                    batch = lil_matrix(X.shape)
-                    batch[users] = X[users]
-                    batch = batch.tocsr()
+    #     results = lil_matrix(X.shape)
+    #     self.model_.eval()
+    #     with torch.no_grad():
+    #         for users in get_batches(get_users(X), batch_size=self.batch_size):
+    #             if isinstance(X, InteractionMatrix):
+    #                 batch = X.users_in(users)
+    #             else:
+    #                 batch = lil_matrix(X.shape)
+    #                 batch[users] = X[users]
+    #                 batch = batch.tocsr()
 
-                results[users] = self._get_top_k_recommendations(self._batch_predict(batch, users=users)[users])
+    #             results[users] = self._get_top_k_recommendations(self._batch_predict(batch, users=users)[users])
 
-        logger.debug(f"shape of response ({results.shape})")
+    #     logger.debug(f"shape of response ({results.shape})")
 
-        return results.tocsr()    
+    #     return results.tocsr()    
 
 #### forward diffusion
 
