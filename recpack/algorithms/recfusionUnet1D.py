@@ -237,7 +237,7 @@ class RecFusionUnet1D(TorchMLAlgorithm):
 
             for t in range(self.T - 1):
                 t = torch.tensor([t], dtype=torch.int32).to(self.device)
-                mu_t = self.model_.forward(Z[t+1][None, None, :, :], t+1)   
+                mu_t = self.model_.forward(Z[t+1][None, :, :], t+1)   
                 Z_hat.append(mu_t)
 
 
@@ -337,7 +337,7 @@ class RecFusionUnet1D(TorchMLAlgorithm):
 
         t = torch.tensor([1], dtype=torch.int32).to(self.device)
         
-        out_tensor = self.model_(in_tensor[None, None, :, :], t)
+        out_tensor = self.model_(in_tensor[None, :, :], t)
 
         result = lil_matrix(X.shape)
         result[users] = out_tensor.detach().cpu().numpy()
