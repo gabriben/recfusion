@@ -696,14 +696,19 @@ class Unet1D(nn.Module):
 
         time_dim = dim * 4
 
-        self.random_or_learned_sinusoidal_cond = learned_sinusoidal_cond or random_fourier_features
+        sinu_pos_emb = SinusoidalPosEmb(time_dim)        
+        fourier_dim = time_dim
+            
+        # self.random_or_learned_sinusoidal_cond = learned_sinusoidal_cond or random_fourier_features
 
-        if self.random_or_learned_sinusoidal_cond:
-            sinu_pos_emb = RandomOrLearnedSinusoidalPosEmb(learned_sinusoidal_dim, random_fourier_features)
-            fourier_dim = learned_sinusoidal_dim + 1
-        else:
-            sinu_pos_emb = SinusoidalPosEmb(dim)
-            fourier_dim = dim
+        # if self.random_or_learned_sinusoidal_cond:
+        #     sinu_pos_emb = RandomOrLearnedSinusoidalPosEmb(learned_sinusoidal_dim, random_fourier_features)
+        #     fourier_dim = learned_sinusoidal_dim + 1
+        # else:
+        #     sinu_pos_emb = SinusoidalPosEmb(dim)
+        #     fourier_dim = dim
+
+
 
         self.time_mlp = nn.Sequential(
             sinu_pos_emb,
