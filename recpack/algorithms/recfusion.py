@@ -406,40 +406,6 @@ def log_normal_diag(x, mu, log_var, reduction=None, dim=None):
         return log_p    
 
 
-#### MLP net
-
-
-class MLP(nn.Module):
-    def __init__(self, depth, D, M):
-        super().__init__()
-        self.m = nn.Sequential(
-            *[nn.Linear(D, M), nn.PReLU()] +
-            [nn.Linear(M, M), nn.PReLU()] * depth +
-            [nn.Linear(M, D), nn.Tanh()])
-        
-    def forward(self, x):
-        return self.m(x)
-
-# def MLP(depth, D, M):
-#     return
-#     nn.Sequential(
-#         *[nn.Linear(D, M), nn.PReLU()] +
-#         [nn.Linear(M, M), nn.PReLU()] * depth +
-#         [nn.Linear(M, D), nn.Tanh()])
-
-
-class MLPperStep(nn.Module):
-    def __init__(self, depth, steps, D, M):
-        super().__init__()
-        self.m = nn.ModuleList([nn.Sequential(
-            *[nn.Linear(D, M), nn.PReLU()] +
-            [nn.Linear(M, M), nn.PReLU()] * depth +
-            [nn.Linear(M, 2*D)]) for _ in range(steps-1)])
-        
-    def forward(self, x, t):
-        return self.m(x, t)
-
-
 #### DDPM Unet
     
 import copy

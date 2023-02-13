@@ -259,3 +259,4 @@ from recpack.algorithms.recfusionMLP import RecFusionMLP
 from recpack.algorithms.recfusionMLPT import RecFusionMLPT
 from recpack.algorithms.recfusionMLPVar import RecFusionMLPVar
 from recpack.algorithms.recfusionCODIGEM import CODIGEM
+from recpack.algorithms.recfusionUnet1D import RecFusionUnet1D
