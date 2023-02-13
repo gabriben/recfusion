@@ -26,7 +26,11 @@ def quick_train(model: str,
     d.add_filter(MinRating(prep_hypers['min_rating'], d.RATING_IX))
     d.add_filter(MinItemsPerUser(prep_hypers['min_items_per_user'], d.ITEM_IX, d.USER_IX))
     d.add_filter(MinUsersPerItem(prep_hypers['min_users_per_item'], d.ITEM_IX, d.USER_IX))
+
     x = d.load()
+    if prep_hypers['force_even_items'] and x.shape[1] % 2 != 0:
+        d.add_filter(NMostPopular(x.shape[1] - 1, d.ITEM_IX))
+        x = d.load()
 
     # first split train_val and test    
     train, val, test = prep_hypers["train_val_test"]

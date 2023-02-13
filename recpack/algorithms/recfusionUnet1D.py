@@ -190,7 +190,7 @@ class RecFusionUnet1D(TorchMLAlgorithm):
 
         D = X.shape[1] # number of items
 
-        self.model_ = Unet1D(dim = 1, channels = 1, resnet_block_groups=1, dim_mults=(1, 2)).to(self.device)
+        self.model_ = Unet1D(dim = 1, channels = 1, resnet_block_groups=1, dim_mults=(1, 2)).to(self.device) # dim_mults=(1, )
 
         self.optimizer = optim.Adam(self.model_.parameters(), lr=self.learning_rate)
 

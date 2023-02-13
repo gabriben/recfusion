@@ -427,7 +427,7 @@ class MLPT(nn.Module):
         self.tm = nn.Linear(self.t_dim, D)
         
     def forward(self, x, ts):
-        
+        # x + t instead of h + t
         h = self.m(x)
         t_emb = calc_t_emb(ts, self.t_dim)        
         t = self.tm(t_emb)
