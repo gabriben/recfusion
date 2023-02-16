@@ -11,8 +11,9 @@ import wandb
 
 def quick_train(model: str, 
                 dataset: str, 
-                prep_hypers: dict, 
-                train_hypers: dict, 
+                prep_hypers: dict,
+                architecture_hypers: dict,
+                train_hypers: dict,
                 val_metric: dict, 
                 test_metrics: dict):
 
@@ -50,7 +51,8 @@ def quick_train(model: str,
     scenario.split(x)
     builder = PipelineBuilder()
     builder.set_data_from_scenario(scenario)
-    builder.add_algorithm(model, params=train_hypers)
+    builder.add_algorithm(model,
+                          params=train_hypers.update(architecture_hypers))
 
     for m, K in val_metric.items():
       builder.set_optimisation_metric(m, K=K)

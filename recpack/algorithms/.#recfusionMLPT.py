@@ -1,1 +1,1 @@
-gabrielbenedict@MacBook-Pro-6.local.521
+gabrielbenedict@macbook-pro.home.521

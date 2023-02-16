@@ -126,7 +126,9 @@ class RecFusionMLPT(TorchMLAlgorithm):
         p_dnns_depth: int = 4,
         # decoder_net_depth: int = 4
 
-        accumulate_batches: int = None
+        accumulate_batches: int = None,
+
+        time_embedding_as_input: bool = False
             
     ):
 
@@ -165,6 +167,8 @@ class RecFusionMLPT(TorchMLAlgorithm):
         self.p_dnns_depth = p_dnns_depth
 
         self.accumulate_batches = accumulate_batches
+
+        self.time_embedding_as_input = time_embedding_as_input
         
         # self.dropout = dropout
 
@@ -417,8 +421,9 @@ import math
 import torch
 
 class MLPT(nn.Module):
-    def __init__(self, depth, D, M):
+    def __init__(self, depth, D, M, time_embedding_as_input):
         super().__init__()
+        self.tx = time_embedding_as_input
         self.t_dim = 128
         self.m = nn.Sequential(
             *[nn.Linear(D, M), nn.PReLU()] +
@@ -427,11 +432,14 @@ class MLPT(nn.Module):
         self.tm = nn.Linear(self.t_dim, D)
         
     def forward(self, x, ts):
-        # x + t instead of h + t
-        h = self.m(x)
+
         t_emb = calc_t_emb(ts, self.t_dim)        
         t = self.tm(t_emb)
-        return h + t
+        
+        if self.tx:
+            return self.m(x + t)
+        else:
+            return self.m(x) + t
 
 
 def calc_t_emb(ts, t_dim):
