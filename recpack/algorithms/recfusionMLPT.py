@@ -196,7 +196,8 @@ class RecFusionMLPT(TorchMLAlgorithm):
 
         # self.model_ = OriginalUnet(dim = 1, channels = 1, resnet_block_groups=1, dim_mults=(1, 2)).to(self.device)
 
-        self.model_ = MLPT(self.p_dnns_depth, D, self.M).to(self.device)
+        self.model_ = MLPT(self.p_dnns_depth, D, self.M,
+                           self.time_embedding_as_input).to(self.device)
 
         self.optimizer = optim.Adam(self.model_.parameters(), lr=self.learning_rate)
 
