@@ -17,7 +17,7 @@ def quick_train(model: str,
                 val_metric: dict, 
                 test_metrics: dict):
 
-    wandb.init(mode = "online")
+    # wandb.init(mode = "online")
 
     wandb.config.dataset = dataset
     wandb.config.update(prep_hypers)
