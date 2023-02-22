@@ -62,4 +62,4 @@ def quick_train(model: str,
     pipeline = builder.build()
     pipeline.run()
 
-    return pipeline #.get_metrics(short=True)
+    return pipeline.get_metrics(short=True)
