@@ -217,7 +217,7 @@ class Pipeline(object):
             df.index = df.index.map(lambda x: x.split("(")[0])
 
         # wb = {m : v for m,v in zip(df.columns, df.values[0])}
-        if wandb is not None:
+        if wandb.run is not None:
             for m, v in zip(df.columns, df.values[0]):
                 wandb.run.summary[m] = v
             
