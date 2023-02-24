@@ -62,4 +62,8 @@ def quick_train(model: str,
     pipeline = builder.build()
     pipeline.run()
 
-    return pipeline#.get_metrics(short=True)
+    last_val = wandb.run.summary["val_ndcg@50"]
+
+    wandb.finish()
+
+    return (pipeline.get_metrics(short=True), last_val)
