@@ -236,23 +236,23 @@ class RecFusionMLP(TorchMLAlgorithm):
             # =====
             # forward difussion
 
-            Z = [make_noise(X, 0, self.betas[0])]
+            self.Z = [make_noise(X, 0, self.betas[0])]
 
             for i in range(1, self.T):
-                Z.append(make_noise(Z[-1], i, self.betas[i]))                
+                self.Z.append(make_noise(self.Z[-1], i, self.betas[i]))                
 
             # =====
             # backward diffusion
 
-            Z_hat = []
+            self.Z_hat = []
 
             for t in range(self.T):
 
                 t = torch.tensor([t], dtype=torch.int32).to(self.device)
 
-                h = self.model_.forward(Z[t])
+                h = self.model_.forward(self.Z[t])
 
-                Z_hat.append(h)
+                self.Z_hat.append(h)
 
 
             self.update += 1
@@ -261,7 +261,7 @@ class RecFusionMLP(TorchMLAlgorithm):
             else:
                 anneal = self.anneal_cap
             
-            loss = self._compute_loss(X, Z_hat, anneal)            
+            loss = self._compute_loss(X, self.Z_hat, anneal)            
             loss.backward()
             losses.append(loss.item())
 
