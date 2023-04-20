@@ -324,7 +324,7 @@ class RecFusionBin(TorchMLAlgorithm):
 
         for i in range(len(Z_hat)):
             KL_i = (log_normal_diag(self.Z[i], torch.sqrt(1. - self.betas[i]) * self.Z[i], torch.log(
-                self.betas[i])) - log_normal_diag(self.Z[i], self.Z_hat[i], self.log_vars[i])).sum(-1)            
+                self.betas[i])) - log_normal_diag(self.Z[i], self.Z_hat[i], self.betas[i])).sum(-1)            
         
         # for i in range(len(self.mus)):
         #     KL_i = (log_normal_diag(self.Z[i], torch.sqrt(1. - self.betas[i]) * self.Z[i], torch.log(
