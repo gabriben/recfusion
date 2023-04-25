@@ -23,7 +23,7 @@ def quick_train(model: str,
     wandb.config.update(prep_hypers)
 
     
-    p = prep_hypers['ds_path'] if 'path' in prep_hypers.keys() else 'datasets/'
+    p = prep_hypers['ds_path'] if 'ds_path' in prep_hypers.keys() else 'datasets/'
     
     d = eval(dataset)(path=p, use_default_filters=False)
     d.add_filter(MinRating(prep_hypers['min_rating'], d.RATING_IX))
