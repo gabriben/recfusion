@@ -22,7 +22,10 @@ def quick_train(model: str,
     wandb.config.dataset = dataset
     wandb.config.update(prep_hypers)
 
-    d = eval(dataset)(path='datasets/', filename=dataset+'.csv', use_default_filters=False)
+    
+    p = prep_hypers['ds_path'] if 'path' in prep_hypers.keys() else 'datasets/'
+    
+    d = eval(dataset)(path=p, use_default_filters=False)
     d.add_filter(MinRating(prep_hypers['min_rating'], d.RATING_IX))
     d.add_filter(MinItemsPerUser(prep_hypers['min_items_per_user'], d.ITEM_IX, d.USER_IX))
     d.add_filter(MinUsersPerItem(prep_hypers['min_users_per_item'], d.ITEM_IX, d.USER_IX))
