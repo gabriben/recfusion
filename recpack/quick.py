@@ -21,6 +21,8 @@ def quick_train(model: str,
 
     wandb.config.dataset = dataset
     wandb.config.update(prep_hypers)
+    wandb.config.update({"model": model})
+    wandb.config.update(prep_hypers)   
 
     
     p = prep_hypers['ds_path'] if 'ds_path' in prep_hypers.keys() else 'datasets/'

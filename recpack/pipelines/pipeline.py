@@ -21,8 +21,6 @@ from recpack.matrix import InteractionMatrix
 
 logger = logging.getLogger("recpack")
 
-import wandb
-
 class MetricAccumulator:
     """Accumulates metrics and
     provides methods to aggregate results into usable formats.
@@ -128,9 +126,6 @@ class Pipeline(object):
     def run(self):
         """Runs the pipeline."""
         for algorithm_entry in tqdm(self.algorithm_entries):
-
-            wandb.config.update({"model": self.name})
-            wandb.config.update(vars(self))
             
             # Check whether we need to optimize hyperparameters
             if algorithm_entry.optimise:
