@@ -55,9 +55,10 @@ def quick_train(model: str,
     builder = PipelineBuilder()
     builder.set_data_from_scenario(scenario)
     builder.add_algorithm(model, params=train_hypers) # .update(architecture_hypers)
-    
-    for m, K in val_metric.items():
-      builder.set_optimisation_metric(m, K=K)
+
+    if len(val_metric) > 1:
+        for m, K in val_metric.items():
+            builder.set_optimisation_metric(m, K=K)
 
     for m, K in test_metrics.items():
       builder.add_metric(m, K=K)
@@ -65,7 +66,7 @@ def quick_train(model: str,
     pipeline = builder.build()
     pipeline.run()
 
-    last_val = wandb.run.summary["val_ndcg@50"]
+    last_val = wandb.run.summary["val_ndcg@50"] if "val_ndcg@50" in wandb.run.summary.keys() else 0
 
     table_of_results = pipeline.get_metrics(short=True)
 
