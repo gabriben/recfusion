@@ -128,6 +128,10 @@ class Pipeline(object):
     def run(self):
         """Runs the pipeline."""
         for algorithm_entry in tqdm(self.algorithm_entries):
+
+            wandb.config.update({"model": self.name})
+            wandb.config.update(vars(self))
+            
             # Check whether we need to optimize hyperparameters
             if algorithm_entry.optimise:
                 params = self._optimise(algorithm_entry)

@@ -22,8 +22,6 @@ from recpack.util import get_top_K_values
 
 logger = logging.getLogger("recpack")
 
-import wandb
-
 class Algorithm(BaseEstimator):
     """Base class for all recpack algorithm implementations.
 
@@ -663,9 +661,6 @@ class TorchMLAlgorithm(Algorithm):
         :rtype: TorchMLAlgorithm
         """
         start = time.time()
-       
-        wandb.config.update({"model": self.name})
-        wandb.config.update(vars(self))
         
         # Preconditions:
         # The target for prediction is the validation data.
