@@ -21,6 +21,8 @@ from recpack.matrix import InteractionMatrix
 
 logger = logging.getLogger("recpack")
 
+import wandb
+
 class MetricAccumulator:
     """Accumulates metrics and
     provides methods to aggregate results into usable formats.
