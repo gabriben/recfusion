@@ -1,3 +1,10 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 import logging
 
 import numpy as np
@@ -24,21 +31,19 @@ class RecallK(ListwiseMetricK):
     :param K: Size of the recommendation list consisting of the Top-K item predictions.
     :type K: int
     """
+
     def __init__(self, K):
         super().__init__(K)
 
     def _calculate(self, y_true: csr_matrix, y_pred_top_K: csr_matrix) -> None:
-
         scores = scipy.sparse.lil_matrix(y_pred_top_K.shape)
 
         # Elementwise multiplication of top K predicts and true interactions
-        scores[y_pred_top_K.multiply(y_true).astype(np.bool)] = 1
+        scores[y_pred_top_K.multiply(y_true).astype(bool)] = 1
 
         scores = scores.tocsr()
 
-        self.scores_ = csr_matrix(
-            sparse_divide_nonzero(scores, csr_matrix(y_true.sum(axis=1))).sum(axis=1)
-        )
+        self.scores_ = csr_matrix(sparse_divide_nonzero(scores, csr_matrix(y_true.sum(axis=1))).sum(axis=1))
 
         return
 
@@ -69,16 +74,15 @@ class CalibratedRecallK(ListwiseMetricK):
         super().__init__(K)
 
     def _calculate(self, y_true: csr_matrix, y_pred_top_K: csr_matrix) -> None:
-
         scores = scipy.sparse.lil_matrix(y_pred_top_K.shape)
 
         # Elementwise multiplication of top K predicts and true interactions
-        scores[y_pred_top_K.multiply(y_true).astype(np.bool)] = 1
+        scores[y_pred_top_K.multiply(y_true).astype(bool)] = 1
         scores = scores.tocsr()
 
         optimal = csr_matrix(np.minimum(y_true.sum(axis=1), self.K))
 
-        self.scores_ = sparse_divide_nonzero(scores, optimal).sum(axis=1)
+        self.scores_ = csr_matrix(sparse_divide_nonzero(scores, optimal).sum(axis=1))
 
 
 def calibrated_recall_k(y_true, y_pred, k):

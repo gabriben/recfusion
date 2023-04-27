@@ -1,3 +1,10 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -62,6 +69,18 @@ def data_knn():
 def mat():
     data = {
         TIMESTAMP_IX: [3, 2, 1, 4, 0, 1, 2, 4, 0, 1, 2],
+        ITEM_IX: [0, 1, 2, 3, 0, 1, 2, 4, 0, 1, 2],
+        USER_IX: [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5],
+    }
+    df = pd.DataFrame.from_dict(data)
+
+    return InteractionMatrix(df, ITEM_IX, USER_IX, timestamp_ix=TIMESTAMP_IX)
+
+
+@pytest.fixture(scope="function")
+def mat_no_zero_timestamp():
+    data = {
+        TIMESTAMP_IX: [4, 3, 2, 5, 1, 2, 3, 5, 1, 2, 3],
         ITEM_IX: [0, 1, 2, 3, 0, 1, 2, 4, 0, 1, 2],
         USER_IX: [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5],
     }

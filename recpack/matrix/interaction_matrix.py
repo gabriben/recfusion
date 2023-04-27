@@ -1,3 +1,10 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+from copy import deepcopy
 from dataclasses import dataclass, asdict
 import logging
 import operator
@@ -28,11 +35,11 @@ class InteractionMatrix:
         item ids and user ids.
     :type df: pd.DataFrame
     :param item_ix: Item ids column name.
-    :type item_ix: string
+    :type item_ix: str
     :param user_ix: User ids column name.
-    :type user_ix: string
+    :type user_ix: str
     :param timestamp_ix: Interaction timestamps column name.
-    :type timestamp_ix: string, optional
+    :type timestamp_ix: str, optional
     :param shape: The desired shape of the matrix, i.e. the number of users and items.
         If no shape is specified, the number of users will be equal to the
         maximum user id plus one, the number of items to the maximum item
@@ -59,18 +66,9 @@ class InteractionMatrix:
         df: pd.DataFrame,
         item_ix: str,
         user_ix: str,
-        timestamp_ix: str = None,
-        shape: Tuple[int, int] = None,
+        timestamp_ix: Optional[str] = None,
+        shape: Optional[Tuple[int, int]] = None,
     ):
-
-        # Give each interaction a unique id,
-        # this will allow selection of specific events
-        # TODO Should check if these are unique. Or mabe just override
-        if InteractionMatrix.INTERACTION_IX in df.columns:
-            pass
-        else:
-            df = df.reset_index().rename(columns={"index": InteractionMatrix.INTERACTION_IX})
-
         col_mapper = {
             item_ix: InteractionMatrix.ITEM_IX,
             user_ix: InteractionMatrix.USER_IX,
@@ -78,11 +76,33 @@ class InteractionMatrix:
 
         if timestamp_ix is not None:
             col_mapper[timestamp_ix] = InteractionMatrix.TIMESTAMP_IX
+            df = df.rename(columns=col_mapper)
+            df = df[[InteractionMatrix.USER_IX, InteractionMatrix.ITEM_IX, InteractionMatrix.TIMESTAMP_IX]].copy()
+        else:
+            df = df.rename(columns=col_mapper)
+            df = df[[InteractionMatrix.USER_IX, InteractionMatrix.ITEM_IX]].copy()
 
-        self._df = df.rename(columns=col_mapper)
+        df = df.reset_index(drop=True).reset_index().rename(columns={"index": InteractionMatrix.INTERACTION_IX})
 
-        num_users = self._df[InteractionMatrix.USER_IX].max() + 1 if shape is None else shape[0]
-        num_items = self._df[InteractionMatrix.ITEM_IX].max() + 1 if shape is None else shape[1]
+        self._df = df
+
+        n_users_df = self._df[InteractionMatrix.USER_IX].max() + 1
+        n_items_df = self._df[InteractionMatrix.ITEM_IX].max() + 1
+
+        num_users = n_users_df if shape is None else shape[0]
+        num_items = n_items_df if shape is None else shape[1]
+
+        if n_users_df > num_users:
+            raise ValueError(
+                "Provided shape does not match dataframe, can't have fewer rows than maximal user identifier."
+                f" {num_users} < {n_users_df}"
+            )
+
+        if n_items_df > num_items:
+            raise ValueError(
+                "Provided shape does not match dataframe, can't have fewer columns than maximal item identifier."
+                f" {num_items} < {n_items_df}"
+            )
 
         self.shape = (int(num_users), int(num_items))
 
@@ -92,14 +112,7 @@ class InteractionMatrix:
         :return: Deep copy of this InteractionMatrix.
         :rtype: InteractionMatrix
         """
-        timestamp_ix = self.TIMESTAMP_IX if self.has_timestamps else None
-        return InteractionMatrix(
-            self._df.copy(),
-            InteractionMatrix.ITEM_IX,
-            InteractionMatrix.USER_IX,
-            timestamp_ix=timestamp_ix,
-            shape=self.shape,
-        )
+        return deepcopy(self)
 
     def union(self, im: "InteractionMatrix") -> "InteractionMatrix":
         """Combine events from this InteractionMatrix with another.
@@ -125,8 +138,7 @@ class InteractionMatrix:
 
         df = pd.concat([self._df, im._df])
         return InteractionMatrix(
-            # Drop the interaction index to make sure it gets recreated.
-            df.reset_index(drop=True).drop(columns=[InteractionMatrix.INTERACTION_IX]),
+            df,
             InteractionMatrix.ITEM_IX,
             InteractionMatrix.USER_IX,
             timestamp_ix=timestamp_ix,
@@ -383,6 +395,22 @@ class InteractionMatrix:
 
         return self._apply_mask(mask, inplace=inplace)
 
+    def items_in(self, I: Union[Set[int], List[int]], inplace=False) -> Optional["InteractionMatrix"]:
+        """Keep only interactions with the specified items.
+
+        :param I: A Set or List of items to select the interactions.
+        :type I: Union[Set[int], List[int]]
+        :param inplace: Apply the selection in place or not, defaults to False
+        :type inplace: bool, optional
+        :return: None if `inplace`, otherwise returns a new InteractionMatrix object
+        :rtype: Union[InteractionMatrix, None]
+        """
+        logger.debug("Performing items_in comparison")
+
+        mask = self._df[InteractionMatrix.ITEM_IX].isin(I)
+
+        return self._apply_mask(mask, inplace=inplace)
+
     def interactions_in(self, interaction_ids: List[int], inplace: bool = False) -> Optional["InteractionMatrix"]:
         """Select the interactions by their interaction ids
 
@@ -514,8 +542,26 @@ class InteractionMatrix:
         :return: Number of active users.
         :rtype: int
         """
-        U, _ = self.indices
-        return len(set(U))
+        return len(self.active_users)
+
+    @property
+    def active_items(self) -> Set[int]:
+        """The set of all items with at least one interaction.
+
+        :return: Set of user IDs with at least one interaction.
+        :rtype: Set[int]
+        """
+        _, I = self.indices
+        return set(I)
+
+    @property
+    def num_active_items(self) -> int:
+        """The number of items with at least one interaction.
+
+        :return: Number of active items.
+        :rtype: int
+        """
+        return len(self.active_items)
 
     @property
     def num_interactions(self) -> int:

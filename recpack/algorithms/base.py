@@ -1,6 +1,13 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 import logging
 import time
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import warnings
 
 import numpy as np
@@ -19,6 +26,7 @@ from recpack.algorithms.stopping_criterion import (
 from recpack.algorithms.util import get_batches, get_users, sample_rows
 from recpack.matrix import InteractionMatrix, to_csr_matrix, Matrix
 from recpack.util import get_top_K_values
+
 
 logger = logging.getLogger("recpack")
 
@@ -439,11 +447,11 @@ class TorchMLAlgorithm(Algorithm):
         stop_early: bool = False,
         max_iter_no_change: int = 5,
         min_improvement: float = 0.0,
-        seed: int = None,
+        seed: Optional[int] = None,
         save_best_to_file: bool = False,
         keep_last: bool = False,
-        predict_topK: int = None,
-        validation_sample_size: int = None,
+        predict_topK: Optional[int] = None,
+        validation_sample_size: Optional[int] = None,
     ):
         # TODO batch_size * torch.cuda.device_count() if cuda else batch_size
         #   -> Multi GPU

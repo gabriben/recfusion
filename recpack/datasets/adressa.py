@@ -1,10 +1,18 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 import json
-import numpy as np
 import os
-import pandas as pd
 import tarfile
-from tqdm.auto import tqdm
 from typing import List
+
+import numpy as np
+import pandas as pd
+from tqdm.auto import tqdm
 
 from recpack.datasets.base import Dataset, _fetch_remote
 from recpack.preprocessing.filters import (
@@ -30,7 +38,6 @@ class AdressaOneWeek(Dataset):
     :type path: str, optional
     :param filename: Name of the file, if no name is provided the dataset default
         will be used if known.
-        If the dataset does not have a default filename, a ValueError will be raised.
     :type filename: str, optional
     :param use_default_filters: Should a default set of filters be initialised?
         Defaults to True

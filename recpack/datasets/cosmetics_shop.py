@@ -1,9 +1,16 @@
-"""Module responsible for the CosmeticsShop dataset."""
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+import os
+from typing import List, Optional, Tuple, Union
+import zipfile
 
 import pandas as pd
-from typing import List, Optional, Tuple, Union
-from recpack.datasets.base import Dataset
 
+from recpack.datasets.base import Dataset
 from recpack.preprocessing.filters import (
     Filter,
     MinItemsPerUser,
@@ -17,10 +24,7 @@ class CosmeticsShop(Dataset):
     All information and downloads can be found at
     https://www.kaggle.com/mkechinov/ecommerce-events-history-in-cosmetics-shop.
     Because downloading the data requires a Kaggle account we can't download it here,
-    you should download the data manually and provide the path to one of the monthly
-    files, or a combined file with all events.
-    If a monthly file is given, then only those events will be used. In order to use
-    the full dataset you need to combine the files.
+    you should download the data manually and provide the path to the downloaded zipfile.
 
     Default processing makes sure that:
 
@@ -31,7 +35,6 @@ class CosmeticsShop(Dataset):
         Defaults to `data`
     :type path: str, optional
     :param filename: Name of the file, if no name is provided the dataset default will be used if known.
-        If the dataset does not have a default filename, a ValueError will be raised.
     :type filename: str, optional
     :param use_default_filters: Should a default set of filters be initialised? Defaults to True
     :type use_default_filters: bool, optional
@@ -45,17 +48,15 @@ class CosmeticsShop(Dataset):
 
     USER_IX = "user_id"
     """Name of the column in the DataFrame that contains user identifiers."""
-
     ITEM_IX = "product_id"
     """Name of the column in the DataFrame that contains item identifiers."""
-
     TIMESTAMP_IX = "event_time"
     """Name of the column in the DataFrame that contains timestamp."""
 
     EVENT_TYPE_IX = "event_type"
     """Name of the column in the DataFrame that contains the event_types"""
 
-    DEFAULT_FILENAME = "2019-Dec.csv"
+    DEFAULT_FILENAME = "archive.zip"
     """Default filename that will be used if it is not specified by the user."""
 
     ALLOWED_EVENT_TYPES = ["view", "cart", "remove_from_cart", "purchase"]
@@ -120,19 +121,17 @@ class CosmeticsShop(Dataset):
         """
 
         self.fetch_dataset()
+        dfs = []
+        with zipfile.ZipFile(self.file_path, "r") as zip_ref:
+            for item in zip_ref.filelist:
+                with zip_ref.open(item, 'r') as f:
+                    df = pd.read_csv(f, parse_dates=[self.TIMESTAMP_IX],usecols=self._columns)
+                    # Transform timestamp to seconds since epoch
+                    df.loc[:, self.TIMESTAMP_IX] = df[self.TIMESTAMP_IX].view(int) / 1e9
+                    # Select only the specified event_types
+                    if self.event_types:
+                        df = df[df[self.EVENT_TYPE_IX].isin(self.event_types)].copy()
 
-        df = pd.read_csv(
-            self.file_path,
-            parse_dates=[self.TIMESTAMP_IX],
-        )
+                    dfs.append(df)
 
-        # Adapt timestamp, this makes it so the timestamp is always seconds since epoch
-        df[self.TIMESTAMP_IX] = df[self.TIMESTAMP_IX].view(int) / 1e9  # pandas datetime -> seconds from epoch
-
-        # Select only the specified event_types
-        if self.event_types:
-            df = df[df[self.EVENT_TYPE_IX].isin(self.event_types)].copy()
-
-        df = df[self._columns].copy()
-
-        return df
+        return pd.concat(dfs)[self._columns].copy()

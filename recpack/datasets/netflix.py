@@ -1,8 +1,15 @@
-import numpy as np
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
 import os
-import pandas as pd
-import tarfile
 from typing import List
+import tarfile
+
+import numpy as np
+import pandas as pd
 
 from recpack.datasets.base import Dataset, _fetch_remote
 from recpack.preprocessing.filters import (

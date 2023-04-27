@@ -1,3 +1,10 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 import logging
 
 import numpy as np
@@ -30,7 +37,7 @@ class HitK(ElementwiseMetricK):
         scores = scipy.sparse.lil_matrix(y_pred_top_K.shape)
 
         # Elementwise multiplication of top K predicts and true interactions
-        scores[y_pred_top_K.multiply(y_true).astype(np.bool)] = 1
+        scores[y_pred_top_K.multiply(y_true).astype(bool)] = 1
 
         scores = scores.tocsr()
 

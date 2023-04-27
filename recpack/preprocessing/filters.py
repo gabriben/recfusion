@@ -1,3 +1,10 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 """Filter classes for handling preprocessing of datasets."""
 
 from typing import List
@@ -76,7 +83,7 @@ class MinUsersPerItem(Filter):
         cnt_users_per_item = iids.value_counts()
         items_of_interest = list(cnt_users_per_item[cnt_users_per_item >= self.min_ui].index)
 
-        return df[df[self.item_ix].isin(items_of_interest)]
+        return df[df[self.item_ix].isin(items_of_interest)].copy()
 
 
 class NMostPopular(Filter):
@@ -101,7 +108,7 @@ class NMostPopular(Filter):
 
         items_of_interest = list(cnt_users_per_item[0 : self.N].index)
 
-        return df[df[self.item_ix].isin(items_of_interest)]
+        return df[df[self.item_ix].isin(items_of_interest)].copy()
 
 
 class NMostRecent(Filter):
@@ -126,7 +133,7 @@ class NMostRecent(Filter):
         sorted_df = df[[self.item_ix, self.timestamp_ix]].sort_values(by=self.timestamp_ix, ascending=False)
         ids = sorted_df[[self.item_ix]].drop_duplicates()
 
-        return df[df[self.item_ix].isin(ids[: self.N][self.item_ix])]
+        return df[df[self.item_ix].isin(ids[: self.N][self.item_ix])].copy()
 
 
 class MinItemsPerUser(Filter):
@@ -164,7 +171,7 @@ class MinItemsPerUser(Filter):
         cnt_items_per_user = uids.value_counts()
         users_of_interest = list(cnt_items_per_user[cnt_items_per_user >= self.min_iu].index)
 
-        return df[df[self.user_ix].isin(users_of_interest)]
+        return df[df[self.user_ix].isin(users_of_interest)].copy()
 
 
 class MaxItemsPerUser(Filter):
@@ -204,7 +211,7 @@ class MaxItemsPerUser(Filter):
         cnt_items_per_user = uids.value_counts()
         users_of_interest = list(cnt_items_per_user[cnt_items_per_user <= self.max_iu].index)
 
-        return df[df[self.user_ix].isin(users_of_interest)]
+        return df[df[self.user_ix].isin(users_of_interest)].copy()
 
 
 class MinRating(Filter):
@@ -228,7 +235,7 @@ class MinRating(Filter):
         self.min_rating = min_rating
 
     def apply(self, df):
-        return df[df[self.rating_ix] >= self.min_rating].drop(columns=self.rating_ix)
+        return df[df[self.rating_ix] >= self.min_rating].copy().drop(columns=self.rating_ix)
 
 
 class Deduplicate(Filter):

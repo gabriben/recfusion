@@ -1,6 +1,13 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 import logging
 from typing import List, Tuple
-from scipy.sparse.lil import lil_matrix
+from scipy.sparse import lil_matrix
 
 import torch.nn as nn
 import torch.nn.functional as F
@@ -11,8 +18,7 @@ import numpy as np
 
 from recpack.algorithms.base import TorchMLAlgorithm
 from recpack.algorithms.loss_functions import vae_loss
-from recpack.algorithms.util import naive_sparse2tensor
-from recpack.scenarios.splitters import yield_batches
+from recpack.algorithms.util import naive_sparse2tensor, get_batches
 
 logger = logging.getLogger("recpack")
 
@@ -180,7 +186,7 @@ class MultVAE(TorchMLAlgorithm):
 
         np.random.shuffle(users)
 
-        for batch_idx, user_batch in enumerate(yield_batches(users, self.batch_size)):
+        for batch_idx, user_batch in enumerate(get_batches(users, self.batch_size)):
             X = naive_sparse2tensor(train_data[user_batch, :]).to(self.device)
 
             # Clear gradients

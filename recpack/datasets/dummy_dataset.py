@@ -1,10 +1,15 @@
-"""Module responsible for the DummyDataset dataset."""
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
-from typing import List
-from recpack.datasets.base import Dataset
 
+from recpack.datasets.base import Dataset
 from recpack.preprocessing.filters import (
     Filter,
     MinItemsPerUser,
@@ -19,8 +24,7 @@ class DummyDataset(Dataset):
     :param path: The path to the data directory. UNUSED because dataset is generated and not read from file.
         Defaults to `data`
     :type path: str, optional
-    :param filename: Name of the file, if no name is provided the dataset default will be used if known.
-        UNUSED because dataset is generated and not read from file.
+    :param filename: UNUSED because dataset is generated and not read from file.
     :type filename: str, optional
     :param use_default_filters: Should a default set of filters be initialised? Defaults to True
     :type use_default_filters: bool, optional
@@ -50,7 +54,7 @@ class DummyDataset(Dataset):
     def __init__(
         self,
         path: str = "data",
-        filename: str = None,
+        filename: Optional[str] = None,
         use_default_filters=True,
         seed=None,
         num_users=100,
@@ -66,7 +70,7 @@ class DummyDataset(Dataset):
             self.seed = seed = np.random.get_state()[1][0]
 
         self.num_users = num_users
-        self.num_items = num_users
+        self.num_items = num_items
         self.num_interactions = num_interactions
         self.min_t = min_t
         self.max_t = max_t

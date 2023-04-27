@@ -1,3 +1,10 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 """Module responsible for handling datasets."""
 
 import os
@@ -47,12 +54,12 @@ class Dataset:
     :type use_default_filters: bool, optional
     """
 
-    USER_IX = "user_id"
-    """name of the column in the loaded DataFrame with user identifiers"""
-    ITEM_IX = "item_id"
-    """name of the column in the loaded DataFrame with item identifiers"""
-    TIMESTAMP_IX = "seconds_since_epoch"
-    """name of the column in the loaded DataFrame with timestamp, in seconds since epoch"""
+    USER_IX = None
+    """Name of the column in the DataFrame with user identifiers"""
+    ITEM_IX = None
+    """Name of the column in the DataFrame with item identifiers"""
+    TIMESTAMP_IX = None
+    """Name of the column in the DataFrame that contains time of interaction in seconds since epoch."""
 
     DEFAULT_FILENAME = None
     """Default filename that will be used if it is not specified by the user."""

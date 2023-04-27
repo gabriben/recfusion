@@ -1,8 +1,16 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 from collections import namedtuple
 from typing import Dict, NamedTuple, List, Optional, Any
 
 import recpack.algorithms
 import recpack.metrics
+from recpack.pipelines.hyperparameter_optimisation import OptimisationInfo
 
 
 class Registry:
@@ -106,12 +114,13 @@ class AlgorithmEntry(NamedTuple):
     """
 
     name: str
-    grid: Optional[Dict[str, List]] = None
+    # grid: Optional[Dict[str, List]] = None
+    optimisation_info: Optional[OptimisationInfo] = None
     params: Optional[Dict[str, Any]] = None
 
     @property
     def optimise(self):
-        return True if self.grid is not None and len(self.grid) != 0 else False
+        return self.optimisation_info is not None
 
 
 ALGORITHM_REGISTRY = AlgorithmRegistry()

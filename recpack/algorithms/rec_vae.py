@@ -1,3 +1,10 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 from copy import deepcopy
 import logging
 from typing import List, Tuple, Optional
@@ -10,12 +17,7 @@ import torch
 import torch.optim as optim
 
 from recpack.algorithms.base import TorchMLAlgorithm
-from recpack.algorithms.util import (
-    swish,
-    log_norm_pdf,
-    naive_sparse2tensor,
-)
-from recpack.scenarios.splitters import yield_batches
+from recpack.algorithms.util import swish, log_norm_pdf, naive_sparse2tensor, get_batches
 
 
 logger = logging.getLogger("recpack")
@@ -33,6 +35,7 @@ class RecVAE(TorchMLAlgorithm):
 
 
     Default values for parameters were taken from the paper.
+
     :param batch_size: Batch size for SGD, defaults to 500
     :type batch_size: int, optional
     :param max_epochs: Maximum number of epochs (iterations),
@@ -51,7 +54,7 @@ class RecVAE(TorchMLAlgorithm):
     :param learning_rate: Learning rate, defaults to 1e-4
     :type learning_rate: float, optional
     :param dim_bottleneck_layer: Size of the latent representation,
-                                    defaults to 200
+        defaults to 200
     :type dim_bottleneck_layer: int, optional
     :param dim_hidden_layer: Dimension of the hidden layer, defaults to 600
     :type dim_hidden_layer: int, optional
@@ -226,7 +229,7 @@ class RecVAE(TorchMLAlgorithm):
         losses = []
         np.random.shuffle(users)
 
-        for batch_idx, user_batch in enumerate(yield_batches(users, self.batch_size)):
+        for batch_idx, user_batch in enumerate(get_batches(users, self.batch_size)):
             X = naive_sparse2tensor(train_data[user_batch, :]).to(self.device)
 
             # Clear gradients

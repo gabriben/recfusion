@@ -1,9 +1,17 @@
-"""Module responsible for the ThirtyMusicSessions dataset."""
-
-import pandas as pd
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+import os
 from typing import List
-from recpack.datasets.base import Dataset
+import zipfile
 
+import numpy as np
+import pandas as pd
+
+from recpack.datasets.base import Dataset, _fetch_remote
 from recpack.preprocessing.filters import (
     Filter,
     MinItemsPerUser,
@@ -26,7 +34,6 @@ class ThirtyMusicSessions(Dataset):
         Defaults to `data`
     :type path: str, optional
     :param filename: Name of the file, if no name is provided the dataset default will be used if known.
-        If the dataset does not have a default filename, a ValueError will be raised.
     :type filename: str, optional
     :param use_default_filters: Should a default set of filters be initialised? Defaults to True
     :type use_default_filters: bool, optional

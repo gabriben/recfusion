@@ -1,13 +1,22 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 import logging
 from collections.abc import Iterable
 import datetime
 import os
 from typing import Tuple, Union, Dict, List, Optional, Any
+import warnings
 
 import numpy as np
 
 from recpack.algorithms.base import TorchMLAlgorithm
 from recpack.matrix import InteractionMatrix
+from recpack.pipelines.hyperparameter_optimisation import OptimisationInfo, GridSearchInfo
 from recpack.pipelines.pipeline import Pipeline
 from recpack.pipelines.registries import (
     ALGORITHM_REGISTRY,
@@ -67,14 +76,14 @@ class PipelineBuilder(object):
 
         return arg
 
-    def add_metric(self, metric: Union[str, type], K: Union[List, int]):
+    def add_metric(self, metric: Union[str, type], K: Optional[Union[List, int]] = None):
         """Register a metric to evaluate
 
         :param metric: Metric name or type.
         :type metric: Union[str, type]
         :param K: The K value(s) used to construct metrics.
             If it is a list, for each value a metric is added.
-        :type K: Union[List, int]
+        :type K: Optional[Union[List, int]], optional
         :raises ValueError: If metric can't be resolved to a key
             in the ``METRIC_REGISTRY``.
         """
@@ -88,7 +97,8 @@ class PipelineBuilder(object):
         if isinstance(K, Iterable):
             for k in K:
                 self.add_metric(metric, k)
-        else:
+        elif K is not None:
+            # TODO Should we validate these K values to see if they make sense?
             # Check if metric already exists
             metric_name = f"{metric}_{K}"
 
@@ -96,12 +106,16 @@ class PipelineBuilder(object):
                 logger.warning(f"Metric {metric_name} already exists.")
             else:
                 self.metric_entries[metric_name] = MetricEntry(metric, K)
+        else:
+            # Bit of a hack to pass none, but it's the best I can do I think.
+            self.metric_entries[metric] = MetricEntry(metric, K)
 
     def add_algorithm(
         self,
         algorithm: Union[str, type],
         grid: Optional[Dict[str, List]] = None,
         params: Optional[Dict[str, Any]] = None,
+        optimisation_info: Optional[OptimisationInfo] = None,
     ):
         """Add an algorithm to use in the pipeline.
 
@@ -110,21 +124,32 @@ class PipelineBuilder(object):
 
         :param algorithm: Algorithm class name or type of the algorithm to add.
         :type algorithm: Union[str, type]
-        :param grid: Parameters to optimise, the dict will be turned into a grid such that each combination of values
+        :param grid: [DEPRECATED] Parameters to optimise,
+            the dict will be turned into a grid such that each combination of values
             is used. Defaults to None
         :type grid: Dict[str, List], optional
         :param params: The fixed parameters for running the algorithm, represented as a key-value dictionary.
             Defaults to None
         :type params: Dict[str, Any], optional
+        :param optimisation_info: Optimisation info,
+            contains information for the optimiser to define the parameter space.
+        :type optimisation_info: OptimisationInfo
         :raises ValueError: If the passed algorithm can't be resolved to a key
             in the ``ALGORITHM_REGISTRY``.
         """
         algorithm = self._arg_to_str(algorithm)
 
+        if grid is not None:
+            optimisation_info = GridSearchInfo(grid)
+
+            warnings.warn(
+                "Grid parameter for add_algorithm function will be deprecated in favour of optimisation_info."
+            )
+
         if algorithm not in ALGORITHM_REGISTRY:
             raise ValueError(f"Algorithm {algorithm} could not be resolved.")
 
-        self.algorithm_entries.append(AlgorithmEntry(algorithm, grid or {}, params or {}))
+        self.algorithm_entries.append(AlgorithmEntry(algorithm, optimisation_info or None, params or {}))
 
     def add_post_filter(self, filter: PostFilter) -> None:
         """Add a filter which will be applied
@@ -178,7 +203,6 @@ class PipelineBuilder(object):
         self.validation_training_data = train_data
 
     def set_validation_data(self, validation_data: Tuple[InteractionMatrix, InteractionMatrix]):
-        # TODO Support csr_matrix
         """Set the validation datasets.
 
         Validation data should be a tuple of InteractionMatrices.

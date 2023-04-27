@@ -1,3 +1,10 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 import numpy as np
 from scipy.sparse import csr_matrix, lil_matrix
 
@@ -11,17 +18,17 @@ class STAN(Algorithm):
     """Sequence and Time Aware Neighbourhoods algorithm.
 
     Algorithm presented by Garg, Diksha, et al.
-    "Sequence and time aware neighborhood for session-based recommendations: Stan."
+    "Sequence and time aware neighborhood for session-based recommendations: STAN."
 
     The algorithm is a modified version of UserKNN with several decay schemes applied.
 
     Each of the user's interactions are weighted by multiplying them with
 
-    ..math::
+    .. math::
 
-        e^{- \\lambda_1 (t_{max} - t_i)}
+        e^{- \\lambda_1 \\, (t_{max} - t_i)}
 
-    Where lambda_1 is the `interaction_decay` parameter.
+    Where lambda_1 is the ``interaction_decay`` parameter.
 
     A second weighting scheme is applied when computing session similarities.
     The time of a session is the last timestamp in that session.
@@ -30,9 +37,9 @@ class STAN(Algorithm):
 
     .. math::
 
-        e^{- \\lambda_2 |T_{s1} - T_{s_2|}
+        e^{- \\lambda_2 \\, |T_{s1} - T_{s_2}|}
 
-    Where lambda_2 is the `session_decay` parameter.
+    Where lambda_2 is the ``session_decay`` parameter.
 
     A final weighting is applied to recommend items closest to
     the last matching item between similar users.
@@ -41,11 +48,11 @@ class STAN(Algorithm):
 
     .. math::
 
-        e^{- \\lambda_3 |pos_i - pos_{matching}|}
+        e^{- \\lambda_3 \\, |pos_i - pos_{matching}|}
 
-    Where lambda_3 is the `distance_from_match_decay` parameter.
+    Where lambda_3 is the ``distance_from_match_decay`` parameter.
 
-    ..note::
+    .. note::
 
         We modified the decay computations from the paper,
         by using a multiplicative weight, rather than a division.
@@ -119,7 +126,7 @@ class STAN(Algorithm):
         full_session_similarity_matrix = lil_matrix((X.shape[0], X.shape[0]))
 
         for user_batch in get_batches(X.active_users, batch_size=1000):
-            session_similarity = self._compute_session_similarity(timestamp_matrix[user_batch, :])
+            session_similarity = self._compute_session_similarity(timestamp_matrix[user_batch, :]).tolil()
             session_similarity = session_similarity.multiply(
                 self._compute_session_similarity_weights(timestamp_matrix[user_batch, :], session_similarity)
             )
@@ -127,8 +134,8 @@ class STAN(Algorithm):
             # Rows are indexed 0 - len(batch), cols are index by original user ids.
             session_similarity[np.arange(len(user_batch)), user_batch] = 0
 
-            full_session_similarity_matrix[user_batch, :] = get_top_K_values(session_similarity, K=self.K)
-        predictions = self._compute_prediction_scores(full_session_similarity_matrix.tocsr(), X)
+            full_session_similarity_matrix[user_batch, :] = get_top_K_values(session_similarity.tocsr(), K=self.K)
+        predictions = self._compute_prediction_scores(full_session_similarity_matrix, X)
         return predictions
 
     def _compute_session_similarity(self, session_timestamps: csr_matrix) -> csr_matrix:
@@ -225,7 +232,7 @@ class STAN(Algorithm):
             neighborhood_scores = session_similarity[session, :].toarray()
 
             # Get the positions of visits in the neighborhood sessions
-            neighborhood_positions = csr_matrix(
+            neighborhood_positions = lil_matrix(
                 self.session_interactions_positions_.multiply((neighborhood_scores > 0).T)
             )
 

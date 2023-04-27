@@ -1,3 +1,10 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 import warnings
 
 import numpy as np
@@ -46,9 +53,9 @@ def test_check_prediction():
         assert len(w) == 1
 
 
-def test_check_fit_complete(pageviews):
+def test_check_fit_complete(X_in):
     # Set a row to 0, so it won't have any neighbours
-    pv_copy = pageviews.copy()
+    pv_copy = X_in.copy()
     pv_copy[:, 4] = 0
 
     a = ItemKNN(2)

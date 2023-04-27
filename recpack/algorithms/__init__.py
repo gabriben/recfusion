@@ -1,3 +1,10 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 """
 
 The algorithms module in recpack contains a wide array of state-of-the-art
@@ -52,8 +59,6 @@ they have interacted with.
 
     SLIM
     ItemKNN
-    TARSItemKNNLiu
-    TARSItemKNN
     ItemPNN
     NMFItemToItem
     SVDItemToItem
@@ -112,6 +117,24 @@ Session-Based Algorithms
     GRU4RecNegSampling
     GRU4RecCrossEntropy
     STAN
+    SequentialRules
+
+Time Aware Algorithms
+----------------------
+
+.. autosummary::
+    :toctree: generated/
+
+    TARSItemKNN
+    TARSItemKNNDing
+    TARSItemKNNLee
+    TARSItemKNNLiu
+    TARSItemKNNLiu2012
+    TARSItemKNNVaz
+    
+    TARSItemKNNCoocDistance
+    TARSItemKNNHermann
+    TARSItemKNNXia
 
 .. _algorithm-base-classes:
 
@@ -262,3 +285,17 @@ from recpack.algorithms.recfusionCODIGEM import CODIGEM
 from recpack.algorithms.recfusionUnet1D import RecFusionUnet1D
 from recpack.algorithms.recfusionBin import RecFusionBin
 from recpack.algorithms.recfusionBinInpaint import RecFusionBinInpaint
+
+from recpack.algorithms.time_aware_item_knn import (
+    TARSItemKNN,
+    TARSItemKNNCoocDistance,
+    TARSItemKNNDing,
+    TARSItemKNNHermann,
+    TARSItemKNNLee,
+    TARSItemKNNLiu,
+    TARSItemKNNLiu2012,
+    TARSItemKNNXia,
+    TARSItemKNNVaz,
+)
+
+from recpack.algorithms.sequential_rules import SequentialRules

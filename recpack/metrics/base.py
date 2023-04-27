@@ -1,3 +1,10 @@
+# RecPack, An Experimentation Toolkit for Top-N Recommendation
+# Copyright (C) 2020  Froomle N.V.
+# License: GNU AGPLv3 - https://gitlab.com/recpack-maintainers/recpack/-/blob/master/LICENSE
+# Author:
+#   Lien Michiels
+#   Robin Verachtert
+
 import logging
 from typing import Tuple
 
@@ -28,7 +35,7 @@ class Metric:
     @property
     def name(self):
         """Name of the metric."""
-        return self.__class__.__name__.lower()
+        return self.__class__.__name__
 
     def _calculate(self, y_true, y_pred) -> None:
         raise NotImplementedError()
