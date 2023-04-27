@@ -22,6 +22,8 @@ from recpack.util import get_top_K_values
 
 logger = logging.getLogger("recpack")
 
+import wandb
+
 class Algorithm(BaseEstimator):
     """Base class for all recpack algorithm implementations.
 
