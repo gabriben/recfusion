@@ -11,8 +11,8 @@ import numpy as np
 
 from recpack.algorithms.base import TorchMLAlgorithm
 from recpack.algorithms.loss_functions import vae_loss
-from recpack.algorithms.util import naive_sparse2tensor
-from recpack.scenarios.splitters import yield_batches, yield_batches_same_size
+from recpack.algorithms.util import naive_sparse2tensor, get_batches
+
 
 from recpack.algorithms import ddpm
 from recpack.algorithms.util import get_batches, get_users, sample_rows
@@ -210,7 +210,7 @@ class RecFusionMLPVar(TorchMLAlgorithm):
 
         np.random.shuffle(users)
 
-        for batch_idx, user_batch in enumerate(yield_batches_same_size(users, self.batch_size)):
+        for batch_idx, user_batch in enumerate(get_batches(users, self.batch_size)):
             X = naive_sparse2tensor(train_data[user_batch, :]).to(self.device)
 
             # Clear gradients
