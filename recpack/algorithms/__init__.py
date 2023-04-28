@@ -274,7 +274,7 @@ from recpack.algorithms.gru4rec import (
 )
 
 from recpack.algorithms.stan import STAN
-from recpack.algorithms.tars_itemknn import TARSItemKNN, TARSItemKNNLiu
+# from recpack.algorithms.tars_itemknn import TARSItemKNN, TARSItemKNNLiu
 
 
 from recpack.algorithms.recfusion import RecFusion
