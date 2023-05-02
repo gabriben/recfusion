@@ -7,8 +7,6 @@ from recpack.preprocessing.filters import MinRating, MinItemsPerUser, MinUsersPe
 
 from recpack.preprocessing.filters import NMostPopular
 
-import os
-
 import wandb
 
 def quick_train(model: str, 
@@ -19,10 +17,6 @@ def quick_train(model: str,
                 val_metric: dict, 
                 test_metrics: dict):
 
-    os.environ["WANDB_API_KEY"] = "0fdcf5f9362df10343978d78bb26152f6f926826"
-    os.environ["WANDB_PROJECT"] = "recpackfusion"
-
-    
     wandb.init(mode = "online")
 
     wandb.config.dataset = dataset
@@ -32,23 +26,14 @@ def quick_train(model: str,
 
     
     p = prep_hypers['ds_path'] if 'ds_path' in prep_hypers.keys() else 'datasets/'
+    
+    d = eval(dataset)(path=p, use_default_filters=False)
+    if dataset != "MillionSongDataset":
+        d.add_filter(MinRating(prep_hypers['min_rating'], d.RATING_IX))
+    d.add_filter(MinItemsPerUser(prep_hypers['min_items_per_user'], d.ITEM_IX, d.USER_IX))
+    d.add_filter(MinUsersPerItem(prep_hypers['min_users_per_item'], d.ITEM_IX, d.USER_IX))
 
-    import pdb
-    pdb.set_trace()
-    
-    potential_csv = p + dataset + '/' + dataset + '.csv'
-    if os.isfile(potential_csv):
-        d = eval(dataset)(path=p, use_default_filters=False)
-        
-        if dataset != "MillionSongDataset":
-            d.add_filter(MinRating(prep_hypers['min_rating'], d.RATING_IX))
-        d.add_filter(MinItemsPerUser(prep_hypers['min_items_per_user'], d.ITEM_IX, d.USER_IX))
-        d.add_filter(MinUsersPerItem(prep_hypers['min_users_per_item'], d.ITEM_IX, d.USER_IX))
-    else:
-        d = eval(dataset)(path='datasets/', filename=dataset+'.csv', use_default_filters=False)
-        
     x = d.load()
-    
     if prep_hypers['force_even_items'] and x.shape[1] % 2 != 0:
         d = eval(dataset)(path='datasets/', filename=dataset+'.csv', use_default_filters=False)
         if dataset != "MillionSongDataset":        
