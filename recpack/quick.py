@@ -36,7 +36,7 @@ def quick_train(model: str,
     import pdb
     pdb.set_trace()
     
-    potential_csv = p + dataset + '/' + dataset + '.csv')
+    potential_csv = p + dataset + '/' + dataset + '.csv'
     if os.isfile(potential_csv):
         d = eval(dataset)(path=p, use_default_filters=False)
         
