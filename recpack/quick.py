@@ -17,6 +17,9 @@ def quick_train(model: str,
                 val_metric: dict, 
                 test_metrics: dict):
 
+    os.environ["WANDB_API_KEY"] = "0fdcf5f9362df10343978d78bb26152f6f926826"
+    os.environ["WANDB_PROJECT"] = "recpackfusion"
+
     wandb.init(mode = "online")
 
     wandb.config.dataset = dataset
