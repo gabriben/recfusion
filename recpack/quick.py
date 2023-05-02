@@ -7,6 +7,8 @@ from recpack.preprocessing.filters import MinRating, MinItemsPerUser, MinUsersPe
 
 from recpack.preprocessing.filters import NMostPopular
 
+import os
+
 import wandb
 
 def quick_train(model: str, 
