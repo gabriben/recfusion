@@ -7,8 +7,6 @@ from recpack.preprocessing.filters import MinRating, MinItemsPerUser, MinUsersPe
 
 from recpack.preprocessing.filters import NMostPopular
 
-import os
-
 import wandb
 
 def quick_train(model: str, 
@@ -18,9 +16,6 @@ def quick_train(model: str,
                 train_hypers: dict,
                 val_metric: dict, 
                 test_metrics: dict):
-
-    os.environ["WANDB_API_KEY"] = "0fdcf5f9362df10343978d78bb26152f6f926826"
-    os.environ["WANDB_PROJECT"] = "recpackfusion"
 
     wandb.init(mode = "online")
 
