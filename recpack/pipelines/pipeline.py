@@ -265,7 +265,7 @@ class Pipeline(object):
         # wb = {m : v for m,v in zip(df.columns, df.values[0])}
         if wandb.run is not None:
             for m, v in zip(df.columns, df.values[0]):
-                wandb.run.summary[m] = v
+                wandb.run.summary[m.lower()] = v
         
         return df
 
