@@ -258,9 +258,6 @@ class Pipeline(object):
             # Parameters are between (), so if we split on the (,
             # we can get the algorithm name by taking the first of the splits.
             df.index = df.index.map(lambda x: x.split("(")[0])
-
-        import pdb
-        pdb.set_trace()
             
         # wb = {m : v for m,v in zip(df.columns, df.values[0])}
         if wandb.run is not None:
