@@ -151,11 +151,15 @@ class StoppingCriterion:
         :return: True if value is better than the previous best value, False if not.
         :rtype: bool
         """
-        loss = self.loss_function(X_true, X_pred, **self.kwargs)
 
-        val_metric = self.loss_function.__name__.split("_")[0]
-        K = self.kwargs['k']
-        wandb.log({'val_' + val_metric + '@' + str(K) : loss})
+        if 'loss_function' in dir(self):
+        
+            loss = self.loss_function(X_true, X_pred, **self.kwargs)
+
+            val_metric = self.loss_function.__name__.split("_")[0]
+        
+            #K = self.kwargs['k'] if 'kwargs' in dir(self) else 'NA' 
+            wandb.log({'val_' + [*val_metric][0] + '@' + str(val_metric[[*val_metric][0]]) : loss})
 
         if self.minimize:
             # If we try to minimize, smaller values of loss are better.
