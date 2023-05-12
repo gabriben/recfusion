@@ -152,14 +152,20 @@ class StoppingCriterion:
         :rtype: bool
         """
 
-        if 'loss_function' in dir(self):
+        loss = self.loss_function(X_true, X_pred, **self.kwargs)
         
-            loss = self.loss_function(X_true, X_pred, **self.kwargs)
+        if 'loss_function' in dir(self):
 
             val_metric = self.loss_function.__name__.split("_")[0]
-        
-            #K = self.kwargs['k'] if 'kwargs' in dir(self) else 'NA' 
-            wandb.log({'val_' + [*val_metric][0] + '@' + str(val_metric[[*val_metric][0]]) : loss})
+
+            if not isinstance(val_metric, dict):
+                val_name = val_metric
+                K = self.kwargs['k'] if 'kwargs' in dir(self) else 'NA'
+            else:
+                val_name = [*val_metric][0]
+                K = val_metric[[*val_metric][0]]
+                
+            wandb.log({'val_' + val_name + '@' + str(K) : loss})
 
         if self.minimize:
             # If we try to minimize, smaller values of loss are better.
