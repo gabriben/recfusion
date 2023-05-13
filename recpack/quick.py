@@ -9,6 +9,8 @@ from recpack.preprocessing.filters import NMostPopular
 
 import wandb
 
+import random
+
 def quick_train(model: str, 
                 dataset: str, 
                 prep_hypers: dict,
@@ -47,13 +49,13 @@ def quick_train(model: str,
     train, val, test = prep_hypers["train_val_test"]
     train_val = train + val
     
-    scenario = eval(prep_hypers['generalization'])(train_val, validation=True)
+    scenario = eval(prep_hypers['generalization'])(train_val, validation=True, seed = random.random())
     # then split train and val from train_val
     if prep_hypers['generalization'] == 'StrongGeneralization':
         scenario.validation_splitter = StrongGeneralizationSplitter(in_frac=train/train_val, seed=scenario.seed)
     elif prep_hypers['generalization'] == 'WeakGeneralization':
         scenario.validation_splitter = FractionInteractionSplitter(in_frac=train/train_val, seed=scenario.seed)
-    # e.g. 0.9 [train-val] * 0.88 -> 0.8 [train] / 0.1 [val]
+    # e.g. 0.9 [train_val] * 0.88 -> 0.8 [train] / 0.1 [val]
 
     scenario.split(x)
     builder = PipelineBuilder()
