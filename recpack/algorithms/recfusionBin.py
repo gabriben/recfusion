@@ -312,7 +312,9 @@ class RecFusionBin(TorchMLAlgorithm):
 
         # Normal RE
         # RE = log_standard_normal(x - mu_x).sum(-1)
-        RE = nn.BCELoss(X, Z_hat[0])
+
+        BCE = nn.BCELoss()
+        RE = BCE(X, Z_hat[0])
         # RE = log_standard_normal(X - Z_hat[0]).sum(-1)
          
         # KL
