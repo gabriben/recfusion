@@ -1,8 +1,3 @@
----
-
----
-
-
 # Model Card for RecFusion
 
 <!-- Provide a quick summary of what the model is/does. [Optional] -->
