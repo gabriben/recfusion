@@ -1,0 +1,41 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.9.7",
+    "heartbeatAt": "2023-06-14T12:58:19.033396",
+    "startedAt": "2023-06-14T12:58:11.196596",
+    "docker": null,
+    "cuda": null,
+    "args": null,
+    "state": "running",
+    "program": "<python with no main file>",
+    "git": {
+        "remote": "https://github.com/gabriben/recfusion.git",
+        "commit": "a1d09a32b3835981ffc67097cae3fc3425d07151"
+    },
+    "email": "gbndict@gmail.com",
+    "root": "/Users/gabrielbenedict/Library/Mobile Documents/com~apple~CloudDocs/Google_Drive/docs/Jobs/Work Experience/Bertelsmann/RTL/projects/ds-bedrock-personalisation/recommendation with diffusion/recpackfusion",
+    "host": "wcw-staff-145-109-85-191.wireless.uva.nl",
+    "username": "gabrielbenedict",
+    "executable": "/usr/local/anaconda3/bin/python",
+    "cpu_count": 8,
+    "cpu_count_logical": 16,
+    "cpu_freq": {
+        "current": 2300,
+        "min": 2300,
+        "max": 2300
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2300,
+            "min": 2300,
+            "max": 2300
+        }
+    ],
+    "disk": {
+        "total": 465.62699127197266,
+        "used": 417.5425567626953
+    },
+    "memory": {
+        "total": 16.0
+    }
+}

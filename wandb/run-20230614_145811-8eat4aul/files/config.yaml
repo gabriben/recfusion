@@ -1,0 +1,64 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.13.7
+    framework: torch
+    is_jupyter_run: true
+    is_kaggle_kernel: true
+    python_version: 3.9.7
+    start_time: 1686747497.501513
+    t:
+      1:
+      - 1
+      - 5
+      - 41
+      - 53
+      - 55
+      2:
+      - 1
+      - 5
+      - 41
+      - 53
+      - 55
+      3:
+      - 2
+      - 19
+      - 23
+      4: 3.9.7
+      5: 0.13.7
+      8:
+      - 1
+      - 2
+      - 5
+dataset:
+  desc: null
+  value: MovieLens100K
+ds_path:
+  desc: null
+  value: datasets
+force_even_items:
+  desc: null
+  value: false
+generalization:
+  desc: null
+  value: WeakGeneralization
+min_items_per_user:
+  desc: null
+  value: 5
+min_rating:
+  desc: null
+  value: 4
+min_users_per_item:
+  desc: null
+  value: 5
+model:
+  desc: null
+  value: RecFusionMLP
+train_val_test:
+  desc: null
+  value:
+  - 0.8
+  - 0.1
+  - 0.1
